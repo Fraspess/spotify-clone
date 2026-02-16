@@ -1,21 +1,23 @@
-import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom'
-import AuthPage from './pages/AuthPage'
+import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
+import AuthPage from './pages/AuthPage';
+import MainLayout from './layouts/MainLayout';
+import Home from './pages/Home'; 
+import SearchPage from './pages/SearchPage';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Головна зараз = сторінка авторизації */}
-        <Route path="/" element={<AuthPage />} />
+        <Route path="/login" element={<AuthPage />} />
 
-        {/* Приклад майбутньої головної сторінки додатку */}
-        {/* <Route path="/app" element={<MainLayout />} /> */}
-
-        {/* Редірект на / для всіх невідомих шляхів */}
+        <Route path="/" element={<MainLayout />}>
+          <Route index element={<Home />} />
+          <Route path="search" element={<SearchPage />} /> 
+        </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
-  )
+  );
 }
 
-export default App
+export default App;
