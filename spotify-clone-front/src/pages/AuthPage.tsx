@@ -1,9 +1,19 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 
 type Mode = 'login' | 'register'
 
 function AuthPage() {
-  const [mode, setMode] = useState<Mode>('login')
+  const [searchParams] = useSearchParams()
+  const modeFromUrl = searchParams.get('mode') as Mode
+  const [mode, setMode] = useState<Mode>(modeFromUrl || 'login')
+
+  useEffect(() => {
+    if (modeFromUrl) {
+      setMode(modeFromUrl)
+    }
+  }, [modeFromUrl])
+  // const [mode, setMode] = useState<Mode>('login')
 
   return (
     <div className="relative min-h-screen bg-bg-main text-text-main flex items-center justify-center px-4 overflow-hidden">
