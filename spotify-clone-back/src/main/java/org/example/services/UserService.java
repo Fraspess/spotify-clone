@@ -20,9 +20,7 @@ public class UserService {
         if (userRepository.existsByEmail(dto.getEmail())) {
             return null;
         }
-        var password = dto.getPassword();
-        var confirmPassword = dto.getConfirmPassword();
-        if (!confirmPassword.equals(password)){
+        if(userRepository.existsByUsername(dto.getUsername())){
             return null;
         }
         var user = userMapper.fromRegisterDTO(dto);
