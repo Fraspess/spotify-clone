@@ -14,39 +14,11 @@ function AuthPage() {
       <div className="relative w-full max-w-md">
         {/* Логотип зверху над формою */}
         <div className="flex flex-col items-center mb-8">
-          <div className="flex flex-col items-center mb-3">
-            {/* Еквалайзер зверху */}
-            <div className="flex items-end gap-1 mb-2 h-8">
-              <div className="w-1 bg-primary rounded-t" style={{ height: '40%', boxShadow: '0 -2px 4px rgba(229, 9, 20, 0.5)' }} />
-              <div className="w-1 bg-primary rounded-t" style={{ height: '60%', boxShadow: '0 -2px 4px rgba(229, 9, 20, 0.5)' }} />
-              <div className="w-1 bg-primary rounded-t" style={{ height: '80%', boxShadow: '0 -2px 4px rgba(229, 9, 20, 0.5)' }} />
-              <div className="w-1 bg-primary rounded-t" style={{ height: '100%', boxShadow: '0 -2px 4px rgba(229, 9, 20, 0.5)' }} />
-              <div className="w-1 bg-primary rounded-t" style={{ height: '90%', boxShadow: '0 -2px 4px rgba(229, 9, 20, 0.5)' }} />
-              <div className="w-1 bg-primary rounded-t" style={{ height: '70%', boxShadow: '0 -2px 4px rgba(229, 9, 20, 0.5)' }} />
-              <div className="w-1 bg-primary rounded-t" style={{ height: '50%', boxShadow: '0 -2px 4px rgba(229, 9, 20, 0.5)' }} />
-              <div className="w-1 bg-primary rounded-t" style={{ height: '30%', boxShadow: '0 -2px 4px rgba(229, 9, 20, 0.5)' }} />
-            </div>
-            
-            {/* Текст AudioLab */}
-            <div className="text-2xl font-extrabold tracking-tight leading-none">
-              <span 
-                className="text-white"
-                style={{ 
-                  textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8), 0 0 8px rgba(0, 0, 0, 0.5)'
-                }}
-              >
-                Audio
-              </span>
-              <span 
-                className="text-primary ml-1"
-                style={{ 
-                  textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8), 0 0 8px rgba(229, 9, 20, 0.3)'
-                }}
-              >
-                Lab
-              </span>
-            </div>
-          </div>
+          <img 
+            src="/audiolab-logo.png" 
+            alt="AudioLab" 
+            className="h-20 w-auto mb-3"
+          />
           <p className="text-sm text-text-muted">Увійдіть або створіть обліковий запис</p>
         </div>
 
