@@ -16,11 +16,11 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-    public String register(UserRegisterDTO dto){
+    public String register(UserRegisterDTO dto) {
         if (userRepository.existsByEmail(dto.getEmail())) {
             return null;
         }
-        if(userRepository.existsByUsername(dto.getUsername())){
+        if (userRepository.existsByUsername(dto.getUsername())) {
             return null;
         }
         var user = userMapper.fromRegisterDTO(dto);
@@ -31,15 +31,26 @@ public class UserService {
     }
 
 
-    public String login(UserLoginDTO dto){
-        var userOpt = userRepository.findByEmail(dto.getEmail());
-        if (userOpt.isEmpty()){
-            return  null;
+    public String login(UserLoginDTO dto) {
+        var userOptEmail = userRepository.findByEmail(dto.getLogin());
+        var userOptUsername = userRepository.findByUsername(dto.getLogin());
+        if (userOptEmail.isPresent()) {
+            var user = userOptEmail.get();
+            var password = user.getPassword();
+            if (passwordEncoder.matches(dto.getPassword(), password)) {
+                return jwtService.generateAccessToken(user);
+            } else {
+                return null;
+            }
         }
-        var user = userOpt.get();
-        var password = user.getPassword();
-        if(passwordEncoder.matches(dto.getPassword(), password)){
-            return jwtService.generateAccessToken(user);
+        else if (userOptUsername.isPresent()){
+            var user = userOptUsername.get();
+            var password = user.getPassword();
+            if (passwordEncoder.matches(dto.getPassword(), password)) {
+                return jwtService.generateAccessToken(user);
+            } else {
+                return null;
+            }
         }
         else{
             return null;
@@ -47,7 +58,7 @@ public class UserService {
 
     }
 
-    public boolean validateToken(String token){
+    public boolean validateToken(String token) {
         return jwtService.validate(token);
     }
 }
