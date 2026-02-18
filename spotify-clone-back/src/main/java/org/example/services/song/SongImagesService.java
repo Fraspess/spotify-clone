@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Service
-public class SongImagesService{
+public class SongImagesService {
     @Value("${music.images.dir}")
     private String uploadDir;
 
@@ -40,18 +40,6 @@ public class SongImagesService{
         }
     }
 
-    public String load(String imageUrl) {
-        if (!imageUrl.startsWith("http://") && !imageUrl.startsWith("https://")) return "";
-
-        try (var inputStream = new URI(imageUrl).toURL().openStream()) {
-            return saveStreamToFile(inputStream);
-        } catch (Exception e) {
-            System.out.println("Problem saving image:" + e);
-            return "";
-        }
-    }
-
-
     public void remove(String fileName) {
         try {
             for (var folder : sizes.keySet()) {
@@ -65,7 +53,7 @@ public class SongImagesService{
 
     public String replace(String oldFileName, MultipartFile newFile) {
         var newFileName = load(newFile);
-        if(newFileName.isEmpty())
+        if (newFileName.isEmpty())
             return oldFileName;
         remove(oldFileName);
         return newFileName;

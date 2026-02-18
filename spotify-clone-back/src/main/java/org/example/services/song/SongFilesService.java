@@ -62,6 +62,7 @@ public class SongFilesService {
             dto.setFileName(fileName);
             dto.setDuration(multimediaObj.getInfo().getDuration() / 1000);
 
+            delete(tempFileName);
             return dto;
 
         }catch (Exception e){
@@ -71,5 +72,15 @@ public class SongFilesService {
             Files.deleteIfExists(tempPath);
         }
 
+    }
+
+    public void delete(String fileName){
+        Path filePath = Paths.get(uploadDir,fileName);
+        try{
+            Files.deleteIfExists(filePath);
+
+        }catch (IOException e){
+            System.out.println(e.getMessage());
+        }
     }
 }

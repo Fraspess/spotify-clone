@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.example.dtos.song.AudioFileDTO;
 import org.example.dtos.song.SongCreateDTO;
 import org.example.dtos.song.SongResponseDTO;
+import org.example.dtos.song.UpdateSongDTO;
+import org.example.entities.song.SongEntity;
 import org.example.entities.user.UserEntity;
 import org.example.mappers.song.SongMapper;
 import org.example.repositories.song.ISongRepository;
@@ -85,7 +87,62 @@ public class SongService {
         return songOpt.map(songMapper::fromEntity).orElse(null);
     }
 
-    public void DeleteById(Integer id){
+    private boolean validateUserRights(Long entityOwnerId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("AUTH AFTER FILTER: " + SecurityContextHolder.getContext().getAuthentication());
+        if (authentication == null) return true;
+
+        String email = authentication.getName();
+        var userOpt = userRepository.findByEmail(email);
+        if (userOpt.isEmpty()) return true;
+
+        var user = userOpt.get();
+        if(entityOwnerId != user.getId()) System.out.println("NOT OWNER");
+        return entityOwnerId == user.getId();
+    }
+
+    public boolean deleteById(Integer id){
+        var songOpt = songRepository.findById(id);
+        if(songOpt.isEmpty()) return false;
+        var song = songOpt.get();
+        if(!validateUserRights(song.getArtist().getId())) return false;
         songRepository.deleteById(id);
+        return true;
+    }
+
+
+    public boolean update(Integer id,UpdateSongDTO dto){
+        Optional<SongEntity> songOpt = songRepository.findById(id);
+        if (songOpt.isEmpty()) return false;
+        var song = songOpt.get();
+        if(!validateUserRights(song.getArtist().getId())) return false;
+        if (dto.getTitle() != null) {
+            song.setTitle(dto.getTitle());
+        }
+
+        if (dto.getRelease_date() != null) {
+            song.setRelease_date(dto.getRelease_date());
+        }
+
+        if (dto.getImageFile() != null && !dto.getImageFile().isEmpty()) {
+            var fileName = songImagesService.replace(song.getImage(), dto.getImageFile());
+            song.setImage(fileName);
+        }
+
+        if (dto.getSongFile() != null && !dto.getSongFile().isEmpty()) {
+            songFilesService.delete(song.getSongFileName());
+            var audioDTO = songFilesService.load(dto.getSongFile());
+            if (audioDTO != null) {
+                song.setDurationInSeconds(audioDTO.getDuration());
+                song.setSongFileName(audioDTO.getFileName());
+            } else {
+                System.out.println("Audio file processing failed.");
+                return false;
+            }
+            song.setDurationInSeconds(audioDTO.getDuration());
+            song.setSongFileName(audioDTO.getFileName());
+        }
+        songRepository.save(song);
+        return true;
     }
 }
