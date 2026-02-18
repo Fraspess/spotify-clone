@@ -1,7 +1,7 @@
-package org.example.mappers;
+package org.example.mappers.user;
 
-import org.example.dtos.UserRegisterDTO;
-import org.example.entities.UserEntity;
+import org.example.dtos.user.UserRegisterDTO;
+import org.example.entities.user.UserEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

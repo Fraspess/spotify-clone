@@ -1,4 +1,4 @@
-package org.example.serverResponses;
+package org.example.serverResponses.user;
 
 import lombok.AllArgsConstructor;
 

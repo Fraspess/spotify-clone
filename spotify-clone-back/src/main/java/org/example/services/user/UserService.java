@@ -1,10 +1,12 @@
-package org.example.services;
+package org.example.services.user;
 
 import lombok.RequiredArgsConstructor;
-import org.example.dtos.UserLoginDTO;
-import org.example.dtos.UserRegisterDTO;
-import org.example.mappers.UserMapper;
-import org.example.repositories.IUserRepository;
+import org.example.dtos.user.UserLoginDTO;
+import org.example.dtos.user.UserRegisterDTO;
+import org.example.mappers.user.UserMapper;
+import org.example.repositories.role.IRoleRepository;
+import org.example.repositories.user.IUserRepository;
+import org.example.services.jwt.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,17 +17,24 @@ public class UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final IRoleRepository roleRepository;
 
     public String register(UserRegisterDTO dto) {
         if (userRepository.existsByEmail(dto.getEmail())) {
             return null;
         }
-        if (userRepository.existsByUsername(dto.getUsername())) {
+        var password = dto.getPassword();
+        var confirmPassword = dto.getConfirmPassword();
+        if (!confirmPassword.equals(password)) {
             return null;
         }
         var user = userMapper.fromRegisterDTO(dto);
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
 
+        var roleOpt = roleRepository.findByName("USER");
+        if (roleOpt.isEmpty()) return null;
+        var role = roleOpt.get();
+        user.getRoles().add(role);
         userRepository.save(user);
         return jwtService.generateAccessToken(user);
     }
@@ -42,8 +51,7 @@ public class UserService {
             } else {
                 return null;
             }
-        }
-        else if (userOptUsername.isPresent()){
+        } else if (userOptUsername.isPresent()) {
             var user = userOptUsername.get();
             var password = user.getPassword();
             if (passwordEncoder.matches(dto.getPassword(), password)) {
@@ -51,8 +59,7 @@ public class UserService {
             } else {
                 return null;
             }
-        }
-        else{
+        } else {
             return null;
         }
 

@@ -7,8 +7,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 public class WebConfig implements WebMvcConfigurer {
 
-    @Value("${images.dir}")
-    private String imagesDir;
+    @Value("${music.images.dir}")
+    private String musicImagesDir;
+
+    @Value("${user.images.dir}")
+    private String userImagesDir;
 
     @Value("${music.dir}")
     private String musicDir;
@@ -17,8 +20,10 @@ public class WebConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/"+musicDir+"/**")
                 .addResourceLocations("file:"+musicDir+"/");
-        registry.addResourceHandler("/" + imagesDir+"/**")
-                .addResourceLocations("file:"+imagesDir);
+        registry.addResourceHandler("/" + musicImagesDir+"/**")
+                .addResourceLocations("file:"+musicImagesDir);
+        registry.addResourceHandler("/" + userImagesDir+"/**")
+                .addResourceLocations("file:"+userImagesDir);
     }
     @Override
     public void addCorsMappings(CorsRegistry registry) {

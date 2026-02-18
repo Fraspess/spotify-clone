@@ -1,9 +1,9 @@
-package org.example.services;
+package org.example.services.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.SignatureException;
-import org.example.entities.UserEntity;
+import org.example.entities.user.UserEntity;
 import org.springframework.beans.factory.annotation.Value;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Service;
@@ -54,7 +54,7 @@ public class JwtService {
                     .parseClaimsJws(token)
                     .getBody();
 
-            return claims.getSubject().split(",")[1];
+            return claims.get("email", String.class);
         }
         catch(Exception ex) {
             return null;
