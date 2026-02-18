@@ -52,17 +52,5 @@ public class UserController {
         }
     }
 
-
-    @PostMapping(value = "/validate-token")
-    public ResponseEntity<AuthResponse> validateToken(@RequestBody String token){
-        if(token == null){return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AuthResponse("Невірно передані дані",null));}
-        var isValid = userService.validateToken(token);
-        if(isValid){
-            return ResponseEntity.status(HttpStatus.OK).body(new AuthResponse("Токен є валідним",token));
-        }
-        else{
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AuthResponse("Пахне не потужним токеном", null));
-        }
-    }
 }
 
