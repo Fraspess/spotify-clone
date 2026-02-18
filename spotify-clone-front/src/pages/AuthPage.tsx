@@ -25,7 +25,7 @@ function AuthPage() {
         {/* Логотип зверху над формою */}
         <div className="flex flex-col items-center mb-8">
           <img 
-            src="/audiolab-logo.png" 
+            src="/src/assets/logo/audiolab.png"
             alt="AudioLab" 
             className="h-20 w-auto mb-3"
           />

@@ -44,4 +44,9 @@ public class SongController {
             return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse<SongResponseDTO>("Успішно отримано пісню", song));
     }
 
+    @DeleteMapping(value = "/deleteById")
+    public ResponseEntity<ServerResponse<String>> deleteById(@RequestParam(value = "id") String idS){
+        var id = Integer.parseInt(idS);
+        return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse<String>("Успішо видалено пісню якщо її знайдено", null));
+    }
 }

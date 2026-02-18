@@ -84,4 +84,8 @@ public class SongService {
         var songOpt = songRepository.findById(id);
         return songOpt.map(songMapper::fromEntity).orElse(null);
     }
+
+    public void DeleteById(Integer id){
+        songRepository.deleteById(id);
+    }
 }
