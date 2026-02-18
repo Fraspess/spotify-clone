@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import audiolabLogo from '../assets/logo/audiolab.png'
 
 type Mode = 'login' | 'register'
 
@@ -25,11 +26,13 @@ function AuthPage() {
         {/* Логотип зверху над формою */}
         <div className="flex flex-col items-center mb-8">
           <img 
-            src="/audiolab-logo.png" 
+            src={audiolabLogo} 
             alt="AudioLab" 
-            className="h-20 w-auto mb-3"
+            className="h-28 w-auto mb-0"
           />
-          <p className="text-sm text-text-muted">Увійдіть або створіть обліковий запис</p>
+          <span className="font-bold text-2xl tracking-tight -mt-4">
+            Audio<span className="text-primary">Lab</span>
+          </span>
         </div>
 
         {/* Карточка форми */}

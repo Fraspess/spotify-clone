@@ -1,12 +1,20 @@
 import { Search } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import LogoutButton from '../LogoutButton/LogoutButton';
 
 const Topbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
   const [searchQuery, setSearchQuery] = useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    setIsAuthenticated(document.cookie.includes('authToken='));
+  }, [location.pathname, location.search]);
+
   return (
     <header className="flex items-center gap-x-4 px-6 py-3 bg-black/20 backdrop-blur-md sticky top-0 z-50">
       
@@ -59,18 +67,24 @@ const Topbar = () => {
       </div>
 
       <div className="flex items-center gap-4 ml-auto">
-        <button 
-          onClick={() => navigate('/login?mode=register')}
-          className="hidden sm:block text-text-muted hover:text-white font-bold text-sm transition"
-        >
-          Зареєструватися
-        </button>
-        <button 
-          onClick={() => navigate('/login?mode=login')}
-          className="bg-white text-black px-6 py-2 rounded-full font-bold hover:scale-105 transition active:scale-95 text-sm"
-        >
-          Увійти
-        </button>
+        {isAuthenticated ? (
+          <LogoutButton onLogout={() => setIsAuthenticated(false)} />
+        ) : (
+          <>
+            <button 
+              onClick={() => navigate('/login?mode=register')}
+              className="hidden sm:block text-text-muted hover:text-white font-bold text-sm transition"
+            >
+              Зареєструватися
+            </button>
+            <button 
+              onClick={() => navigate('/login?mode=login')}
+              className="bg-white text-black px-6 py-2 rounded-full font-bold hover:scale-105 transition active:scale-95 text-sm"
+            >
+              Увійти
+            </button>
+          </>
+        )}
       </div>
           </header>
   );
