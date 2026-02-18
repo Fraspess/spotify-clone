@@ -57,6 +57,7 @@ public class SecurityConfig {
                         .requestMatchers("/swagger/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/songs/getAll").permitAll()
+                        .requestMatchers("/api/test/hello").permitAll()
                         .requestMatchers("/api/songs/getById/**").permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/api/songs/create")
