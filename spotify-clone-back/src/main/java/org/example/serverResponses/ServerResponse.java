@@ -3,7 +3,7 @@ package org.example.serverResponses;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class ServerResponse {
+public class ServerResponse<T> {
     public String message;
-    public String data;
+    public T data;
 }

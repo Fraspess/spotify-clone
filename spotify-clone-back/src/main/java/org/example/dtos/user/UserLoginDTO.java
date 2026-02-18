@@ -1,9 +1,9 @@
-package org.example.dtos;
+package org.example.dtos.user;
 
 import lombok.Data;
 
 @Data
 public class UserLoginDTO {
-    private String email;
+    private String login;
     private String password;
 }

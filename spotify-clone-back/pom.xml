@@ -8,11 +8,24 @@
     <artifactId>spotify-clone-back</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>4.0.2</version>
+    </parent>
+
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
 
     <dependencies>
         <dependency>
@@ -128,6 +141,21 @@
             <artifactId>jsoup</artifactId>
             <version>1.21.2</version>
         </dependency>
+
+        <!-- Source: https://mvnrepository.com/artifact/com.github.a-schild.jave2/jave-core -->
+        <dependency>
+            <groupId>com.github.a-schild.jave2</groupId>
+            <artifactId>jave-core</artifactId>
+            <version>3.5.0</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>ws.schild</groupId>
+            <artifactId>jave-nativebin-win64</artifactId>
+            <version>3.5.0</version>
+        </dependency>
+
 
     </dependencies>
 </project>
