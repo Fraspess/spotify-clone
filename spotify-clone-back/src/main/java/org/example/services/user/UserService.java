@@ -23,11 +23,6 @@ public class UserService {
         if (userRepository.existsByEmail(dto.getEmail())) {
             return null;
         }
-        var password = dto.getPassword();
-        var confirmPassword = dto.getConfirmPassword();
-        if (!confirmPassword.equals(password)) {
-            return null;
-        }
         var user = userMapper.fromRegisterDTO(dto);
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
 
