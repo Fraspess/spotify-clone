@@ -60,7 +60,4 @@ public class UserService {
 
     }
 
-    public boolean validateToken(String token) {
-        return jwtService.validate(token);
-    }
 }
