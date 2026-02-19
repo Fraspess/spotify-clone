@@ -59,7 +59,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/songs/getAll").permitAll()
                         .requestMatchers("/api/test/hello").permitAll()
                         .requestMatchers("/api/songs/getById/**").permitAll()
-
+                        .requestMatchers("/api/users/getByUsername/**").permitAll()
+                        .requestMatchers("/api/users/getAll").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/songs/create")
                         .hasRole("USER")
 

@@ -5,9 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.entities.user.UserEntity;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -15,6 +18,8 @@ import java.util.Set;
 @Table(name = "songs")
 @AllArgsConstructor
 @NoArgsConstructor
+@SQLDelete(sql = "UPDATE songs SET deleted = true WHERE id = ?")
+@SQLRestriction("deleted = false")
 public class SongEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,8 +40,11 @@ public class SongEntity {
     @Column(nullable = false)
     private LocalDate release_date;
 
+    @Column(nullable = false)
+    private boolean deleted = false;
+
     @ManyToMany(mappedBy = "favoriteSongs")
-    private Set<UserEntity> favoritedBy;
+    private List<UserEntity> favoritedBy;
 
     @ManyToOne
     @JoinColumn(name = "artist_id", nullable = false)

@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface ISongRepository extends JpaRepository<SongEntity, Integer> {
-    Optional<SongEntity> findById(Integer id);
+public interface ISongRepository extends JpaRepository<SongEntity, Long> {
+    Optional<SongEntity> findById(Long id);
 }
