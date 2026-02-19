@@ -11,6 +11,7 @@ import org.hibernate.annotations.SQLRestriction;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -54,9 +55,10 @@ public class UserEntity {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "song_id")
     )
-    private Set<SongEntity> favoriteSongs = new HashSet<>();
+    private List<SongEntity> favoriteSongs;
 
     @OneToMany(mappedBy = "artist", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SongEntity> songs;
-
 }
+
+

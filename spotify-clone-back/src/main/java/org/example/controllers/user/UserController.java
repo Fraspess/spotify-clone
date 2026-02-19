@@ -1,20 +1,35 @@
 package org.example.controllers.user;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.User;
+import org.example.dtos.song.FavoriteSongDTO;
+import org.example.dtos.token.TokenDTO;
 import org.example.dtos.user.UserLoginDTO;
 import org.example.dtos.user.UserRegisterDTO;
+import org.example.dtos.user.UserResponseDTO;
+import org.example.dtos.user.UserUpdateDTO;
+import org.example.serverResponses.ServerResponse;
 import org.example.serverResponses.user.AuthResponse;
 import org.example.services.user.UserService;
+import org.example.utils.MultipartFileEditor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/users")
 @RequiredArgsConstructor
 public class UserController {
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        binder.registerCustomEditor(MultipartFile.class, new MultipartFileEditor());
+    }
     private final UserService userService;
-
     @PostMapping(value = "/register")
     public ResponseEntity<AuthResponse> register(@RequestBody UserRegisterDTO dto) {
         if (dto == null) {
@@ -52,7 +67,45 @@ public class UserController {
         }
     }
 
+    @PutMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ServerResponse<String>> update(@ModelAttribute UserUpdateDTO dto){
+        var success = userService.update(dto);
+        if(success) return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse<String>("Успішно оновлено користувача", null));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ServerResponse<String>("Сталася помилка при оновленні користувача",null));
+    }
 
+    @DeleteMapping("/disable")
+    public ResponseEntity<ServerResponse<String>> disable(){
+        var success = userService.disable();
+        if(success) return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse<String>("Аккаунт успішно виключено.",null));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ServerResponse<String>("Сталася помилка або ви не маєте прав на цю дію.",null));
 
+    }
+
+    @GetMapping("/getAll")
+    public ResponseEntity<ServerResponse<List<UserResponseDTO>>> getAll(){
+        var users = userService.getAll();
+        return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse<List<UserResponseDTO>>("Успішно отримано всіх користувачів.", users));
+    }
+
+    @GetMapping("/getByUsername")
+    public ResponseEntity<ServerResponse<UserResponseDTO>> getByUsername(@RequestParam String username){
+        var user = userService.getByUsername(username);
+        if(user == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ServerResponse<UserResponseDTO>("Користувача не знайдено",null));
+        return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse<UserResponseDTO>("Успішно",user));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refresh(@RequestBody TokenDTO dto){
+        var newTokens = userService.refresh(dto.getToken());
+        return ResponseEntity.status(HttpStatus.OK).body(new AuthResponse("Успішно",newTokens));
+    }
+
+    @PostMapping("/favorite")
+    public ResponseEntity<?> favoriteSong(@RequestBody FavoriteSongDTO dto){
+        var success = userService.favoriteSong(dto.getId());
+        if(success) return ResponseEntity.status(HttpStatus.OK).body(null);
+        return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
 }
 

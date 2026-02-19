@@ -10,6 +10,7 @@ import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -43,7 +44,7 @@ public class SongEntity {
     private boolean deleted = false;
 
     @ManyToMany(mappedBy = "favoriteSongs")
-    private Set<UserEntity> favoritedBy;
+    private List<UserEntity> favoritedBy;
 
     @ManyToOne
     @JoinColumn(name = "artist_id", nullable = false)

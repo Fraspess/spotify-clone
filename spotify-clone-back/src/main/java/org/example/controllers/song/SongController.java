@@ -47,7 +47,7 @@ public class SongController {
 
     @GetMapping("/getBy")
     public ResponseEntity<ServerResponse<SongResponseDTO>> getById(@RequestParam(value = "id") String id) {
-        var song = songService.getById(Integer.parseInt(id));
+        var song = songService.getById(Long.valueOf(id));
         if (song == null)
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ServerResponse<SongResponseDTO>("Пісню не знайдено", null));
         return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse<SongResponseDTO>("Успішно отримано пісню", song));
@@ -56,7 +56,7 @@ public class SongController {
     @DeleteMapping(value = "/delete")
     public ResponseEntity<ServerResponse<String>> deleteById(@RequestParam(value = "id") String idS) {
         var id = Integer.parseInt(idS);
-        var success = songService.deleteById(id);
+        var success = songService.deleteById((long) id);
         if (success)
             return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse<String>("Успішо видалено пісню якщо її знайдено", null));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ServerResponse<String>("Помилка при видалені. У вас немає прав або пісні не існує.", null));
@@ -64,7 +64,7 @@ public class SongController {
 
     @PutMapping(value = "/update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ServerResponse<String>> updateById(@PathVariable String id, @ModelAttribute UpdateSongDTO updateSongDTO) {
-        var success = songService.update(Integer.parseInt(id), updateSongDTO);
+        var success = songService.update(Long.valueOf(id), updateSongDTO);
         if(success) return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse<String>("Пісню успішно оновлено",null));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ServerResponse<String>("Сталася помилка або ви не маєте прав на редагування цієї пісні.",null));
     }

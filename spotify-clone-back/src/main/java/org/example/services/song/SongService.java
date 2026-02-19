@@ -82,7 +82,7 @@ public class SongService {
         return true;
     }
 
-    public SongResponseDTO getById(Integer id){
+    public SongResponseDTO getById(Long id){
         var songOpt = songRepository.findById(id);
         return songOpt.map(songMapper::fromEntity).orElse(null);
     }
@@ -101,7 +101,7 @@ public class SongService {
         return entityOwnerId == user.getId();
     }
 
-    public boolean deleteById(Integer id){
+    public boolean deleteById(Long id){
         var songOpt = songRepository.findById(id);
         if(songOpt.isEmpty()) return false;
         var song = songOpt.get();
@@ -111,7 +111,7 @@ public class SongService {
     }
 
 
-    public boolean update(Integer id,UpdateSongDTO dto){
+    public boolean update(Long id,UpdateSongDTO dto){
         Optional<SongEntity> songOpt = songRepository.findById(id);
         if (songOpt.isEmpty()) return false;
         var song = songOpt.get();
