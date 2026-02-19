@@ -35,29 +35,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final String userId;
+
         if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
-            System.out.println("No Authorization header or does not start with Bearer");
             filterChain.doFilter(request, response);
             return;
         }
-        jwt = authHeader.substring(7);
-        userId = jwtService.getUserId(jwt);
-        System.out.println("JWT valid? " + jwtService.validateAccessToken(jwt));
-        if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.userDetailsService.loadUserById(Long.valueOf(userId));
-            if (jwtService.validateAccessToken(jwt)) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
-                SecurityContextHolder.getContext().setAuthentication(authToken);
-                System.out.println("Authorities in SecurityContext: " +
-                        SecurityContextHolder.getContext().getAuthentication().getAuthorities());
+        try {
+            jwt = authHeader.substring(7);
+            userId = jwtService.getUserId(jwt);
+            System.out.println("JWT valid? " + jwtService.validateAccessToken(jwt));
+            if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = this.userDetailsService.loadUserById(Long.valueOf(userId));
+                if (jwtService.validateAccessToken(jwt)) {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
+                    authToken.setDetails(
+                            new WebAuthenticationDetailsSource().buildDetails(request)
+                    );
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                    System.out.println("Authorities in SecurityContext: " +
+                            SecurityContextHolder.getContext().getAuthentication().getAuthorities());
+                }
             }
+        } catch (Exception e) {
+            System.out.println("JWT error: " + e.getMessage());
         }
         filterChain.doFilter(request, response);
     }
