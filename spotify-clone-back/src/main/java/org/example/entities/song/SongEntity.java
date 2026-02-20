@@ -4,13 +4,12 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.entities.album.AlbumEntity;
+import org.example.entities.playlist.PlaylistEntity;
 import org.example.entities.user.UserEntity;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -52,7 +51,7 @@ public class SongEntity {
     private UserEntity artist;
 
     @ManyToMany(mappedBy = "songs")
-    private Set<AlbumEntity> albums;
+    private Set<PlaylistEntity> playlists;
 
     @Override
     public boolean equals(Object o) {

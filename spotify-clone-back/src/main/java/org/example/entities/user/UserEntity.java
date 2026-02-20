@@ -3,14 +3,13 @@ package org.example.entities.user;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
-import org.example.entities.album.AlbumEntity;
+import org.example.entities.playlist.PlaylistEntity;
 import org.example.entities.song.SongEntity;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -61,7 +60,7 @@ public class UserEntity {
     private List<SongEntity> songs;
 
     @OneToMany(mappedBy = "artist", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<AlbumEntity> albums;
+    private Set<PlaylistEntity> playlists;
 
     @Override
     public boolean equals(Object o) {

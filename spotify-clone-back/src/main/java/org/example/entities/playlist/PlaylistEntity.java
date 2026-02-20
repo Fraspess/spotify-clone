@@ -1,4 +1,4 @@
-package org.example.entities.album;
+package org.example.entities.playlist;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,13 +14,13 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-@Table(name = "albums")
+@Table(name = "playlists")
 @AllArgsConstructor
 @NoArgsConstructor
-@SQLDelete(sql = "UPDATE albums SET deleted = true WHERE id = ?")
+@SQLDelete(sql = "UPDATE playlists SET deleted = true WHERE id = ?")
 @SQLRestriction("deleted = false")
 
-public class AlbumEntity {
+public class PlaylistEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -51,8 +51,8 @@ public class AlbumEntity {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof AlbumEntity)) return false;
-        return id != null && id.equals(((AlbumEntity) o).id);
+        if (!(o instanceof PlaylistEntity)) return false;
+        return id != null && id.equals(((PlaylistEntity) o).id);
     }
 
     @Override
