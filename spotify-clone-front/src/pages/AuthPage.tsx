@@ -1,36 +1,115 @@
-import { useState, useEffect } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useState, useEffect,  } from 'react'
+import type { SyntheticEvent, ChangeEvent } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useDispatch } from 'react-redux';
+import { useLoginMutation, useRegisterMutation } from '../services/api';
+import { setCredentials } from '../services/authSlice';
+import { ArrowLeft } from "lucide-react";
 
 type Mode = 'login' | 'register'
 
 function AuthPage() {
   const [searchParams] = useSearchParams()
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const [login, { isLoading: isLoginLoading }] = useLoginMutation()
+  const [register, { isLoading: isRegisterLoading }] = useRegisterMutation()
   const modeFromUrl = searchParams.get('mode') as Mode
   const [mode, setMode] = useState<Mode>(modeFromUrl || 'login')
-
+  
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+  })
+  
+  
   useEffect(() => {
     if (modeFromUrl) {
       setMode(modeFromUrl)
     }
   }, [modeFromUrl])
-  // const [mode, setMode] = useState<Mode>('login')
 
-  return (
+const handleSubmit = async (e: SyntheticEvent) => {
+      e.preventDefault();
+      
+      try {
+        let result: any;
+        if (mode === 'login') {
+          result = await login({ 
+            login: formData.email,
+            password: formData.password 
+          }).unwrap();
+        } else {
+          result = await register({
+            username: formData.username,
+            email: formData.email,
+            password: formData.password
+          }).unwrap();
+        }
+        
+        const token = result?.accessToken || result?.token;
+
+        if (token) {
+              const authData = {
+                user: result.user || { 
+                  email: formData.email, 
+                  username: formData.username || result.username 
+                },
+                token: token
+              };
+
+              dispatch(setCredentials(authData));
+              navigate('/');
+            }
+        
+      } catch (err: any) {
+        const errorMessage = err.data?.message || 'Помилка валідації. Перевірте дані.';
+        alert(errorMessage);
+        console.error('Деталі помилки:', err.data);
+      }
+    };
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setFormData({ 
+      ...formData, 
+      [e.target.name]: e.target.value 
+    });
+  };
+
+ return (
     <div className="relative min-h-screen bg-bg-main text-text-main flex items-center justify-center px-4 overflow-hidden">
       {/* Декоративні елементи фонa */}
       <div className="pointer-events-none absolute -top-32 -left-32 h-64 w-64 rounded-full bg-primary/20 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-40 -right-20 h-72 w-72 rounded-full bg-primary-soft/20 blur-3xl" />
 
-      <div className="relative w-full max-w-md">
+    <button
+      onClick={() => navigate('/')}
+      className="absolute top-8 left-8 flex items-center gap-2 text-text-muted hover:text-white transition-colors group z-50"
+    >
+      <div className="p-2 rounded-full bg-bg-elevated border border-border-subtle group-hover:border-primary/50 transition-all">
+        <ArrowLeft size={20} />
+      </div>
+      <span className="text-sm font-medium hidden sm:block">На головну</span>
+    </button>
+
+    <div className="relative w-full max-w-md">
         {/* Логотип зверху над формою */}
-        <div className="flex flex-col items-center mb-8">
+    <div className="flex flex-col items-center mb-8">
+      <div className="flex items-center justify-center mb-2">
           <img 
             src="/src/assets/logo/audiolab.png"
             alt="AudioLab" 
-            className="h-20 w-auto mb-3"
+            className="h-20 w-auto block select-none object-contain flex-shrink-0"
           />
-          <p className="text-sm text-text-muted">Увійдіть або створіть обліковий запис</p>
-        </div>
+
+          <span className="font-bold text-3xl tracking-tighter whitespace-nowrap leading-none -ml-2">
+            Audio<span className="text-primary">Lab</span>
+          </span>
+      </div>
+    
+    <p className="text-sm text-text-muted">Увійдіть або створіть обліковий запис</p>
+  </div>
 
         {/* Карточка форми */}
         <div className="bg-bg-elevated-soft/80 border border-border-subtle/80 rounded-2xl shadow-soft-xl p-6 md:p-7 backdrop-blur">
@@ -60,13 +139,9 @@ function AuthPage() {
             </button>
           </div>
 
-          {/* Форма */}
           <form
             className="space-y-4"
-            onSubmit={(e) => {
-              e.preventDefault()
-              // TODO: інтегрувати бекенд / валідацію
-            }}
+            onSubmit={handleSubmit}
           >
             {mode === 'register' && (
               <div className="space-y-1.5">
@@ -75,6 +150,9 @@ function AuthPage() {
                 </label>
                 <input
                   type="text"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
                   required
                   placeholder="music_lover"
                   className="w-full rounded-lg bg-bg-elevated border border-border-subtle px-3 py-2 text-sm text-text-main placeholder:text-text-muted/70 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
@@ -88,6 +166,9 @@ function AuthPage() {
               </label>
               <input
                 type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
                 required
                 placeholder="you@example.com"
                 className="w-full rounded-lg bg-bg-elevated border border-border-subtle px-3 py-2 text-sm text-text-main placeholder:text-text-muted/70 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
@@ -110,6 +191,9 @@ function AuthPage() {
               </div>
               <input
                 type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
                 required
                 placeholder="••••••••"
                 className="w-full rounded-lg bg-bg-elevated border border-border-subtle px-3 py-2 text-sm text-text-main placeholder:text-text-muted/70 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
@@ -124,16 +208,15 @@ function AuthPage() {
 
             <button
               type="submit"
-              className="mt-2 w-full inline-flex items-center justify-center gap-2 rounded-xl bg-primary hover:bg-primary-soft text-bg-main font-semibold text-sm py-2.5 transition-colors shadow-md"
+              disabled={isLoginLoading || isRegisterLoading}
+              className="mt-2 w-full inline-flex items-center justify-center gap-2 rounded-xl bg-primary hover:bg-primary-soft text-bg-main font-semibold text-sm py-2.5 transition-colors shadow-md disabled:opacity-50"
             >
-              {mode === 'login' ? 'Увійти' : 'Створити акаунт'}
+              {isLoginLoading || isRegisterLoading ? 'Завантаження...' : mode === 'login' ? 'Увійти' : 'Створити акаунт'}
             </button>
 
             <div className="flex items-center my-4">
               <div className="flex-1 h-px bg-border-subtle" />
-              <span className="px-3 text-xs text-text-muted uppercase tracking-wide">
-                або
-              </span>
+              <span className="px-3 text-xs text-text-muted uppercase tracking-wide">або</span>
               <div className="flex-1 h-px bg-border-subtle" />
             </div>
 
@@ -141,24 +224,6 @@ function AuthPage() {
               type="button"
               className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-bg-elevated hover:bg-bg-elevated-soft text-text-main font-medium text-sm py-2.5 border border-border-subtle transition-colors"
             >
-              <svg className="h-5 w-5" viewBox="0 0 24 24">
-                <path
-                  fill="#4285F4"
-                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                />
-                <path
-                  fill="#34A853"
-                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                />
-                <path
-                  fill="#FBBC05"
-                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                />
-                <path
-                  fill="#EA4335"
-                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                />
-              </svg>
               <span>Продовжити з Google</span>
             </button>
           </form>
@@ -168,4 +233,4 @@ function AuthPage() {
   )
 }
 
-export default AuthPage
+export default AuthPage;
