@@ -1,4 +1,4 @@
-package org.example.dtos.album;
+package org.example.dtos.playlist;
 
 import lombok.Data;
 

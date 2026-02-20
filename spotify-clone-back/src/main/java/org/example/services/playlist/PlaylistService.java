@@ -1,9 +1,9 @@
 package org.example.services.playlist;
 
 import lombok.RequiredArgsConstructor;
-import org.example.dtos.album.PlaylistAddSongDTO;
-import org.example.dtos.album.PlaylistCreateDTO;
-import org.example.dtos.album.PlaylistResponseDTO;
+import org.example.dtos.playlist.PlaylistAddSongDTO;
+import org.example.dtos.playlist.PlaylistCreateDTO;
+import org.example.dtos.playlist.PlaylistResponseDTO;
 import org.example.entities.user.UserEntity;
 import org.example.mappers.playlist.PlaylistMapper;
 import org.example.repositories.playlist.IPlaylistRepository;

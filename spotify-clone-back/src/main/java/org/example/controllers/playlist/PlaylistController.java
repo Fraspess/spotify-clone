@@ -1,9 +1,9 @@
 package org.example.controllers.playlist;
 
 import lombok.RequiredArgsConstructor;
-import org.example.dtos.album.PlaylistAddSongDTO;
-import org.example.dtos.album.PlaylistCreateDTO;
-import org.example.dtos.album.PlaylistResponseDTO;
+import org.example.dtos.playlist.PlaylistAddSongDTO;
+import org.example.dtos.playlist.PlaylistCreateDTO;
+import org.example.dtos.playlist.PlaylistResponseDTO;
 import org.example.serverResponses.ServerResponse;
 import org.example.services.playlist.PlaylistService;
 import org.example.utils.MultipartFileEditor;

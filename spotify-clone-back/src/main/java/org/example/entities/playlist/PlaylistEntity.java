@@ -42,8 +42,8 @@ public class PlaylistEntity {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "album_songs",
-            joinColumns = @JoinColumn(name = "album_id"),
+            name = "playlist_songs",
+            joinColumns = @JoinColumn(name = "playlist_id"),
             inverseJoinColumns = @JoinColumn(name = "song_id")
     )
     private Set<SongEntity> songs = new HashSet<>();

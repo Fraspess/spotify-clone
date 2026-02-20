@@ -2,7 +2,7 @@ package org.example.dtos.user;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.example.dtos.album.PlaylistResponseDTO;
+import org.example.dtos.playlist.PlaylistResponseDTO;
 import org.example.dtos.song.SongShortDTO;
 
 import java.util.HashSet;
