@@ -89,7 +89,7 @@ public class UserService {
         return true;
     }
 
-
+// паша
     public boolean update(UserUpdateDTO dto) {
         var user = getUser();
         if (user == null) return false;

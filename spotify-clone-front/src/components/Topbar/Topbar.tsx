@@ -1,5 +1,5 @@
 import { Search, User } from 'lucide-react'; // static icon pike ne merge pashu
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../services/store';
@@ -10,6 +10,16 @@ const Topbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const { token, user } = useSelector((state: RootState) => state.auth);
+
+  useEffect(() => {
+    if (location.pathname === '/search') {
+      const params = new URLSearchParams(location.search);
+      const q = params.get('q') || '';
+      setSearchQuery(q);
+    } else {
+      setSearchQuery('');
+    }
+  }, [location.pathname, location.search]);
 
   return (
     <header className="flex items-center gap-x-4 px-6 py-3 bg-black/20 backdrop-blur-md sticky top-0 z-50">
@@ -41,9 +51,19 @@ const Topbar = () => {
           value={searchQuery}
           onChange={(e) => {
             const val = e.target.value;
-            setSearchQuery(val); 
-            if (val.trim() === "") navigate('/');
-            else if (location.pathname !== '/search') navigate('/search');
+            setSearchQuery(val);
+
+            const trimmed = val.trim();
+            if (trimmed === '') {
+              navigate('/');
+            } else {
+              const encoded = encodeURIComponent(trimmed);
+              if (location.pathname === '/search') {
+                navigate(`/search?q=${encoded}`, { replace: true });
+              } else {
+                navigate(`/search?q=${encoded}`);
+              }
+            }
           }}
           className="w-full bg-bg-elevated hover:bg-bg-elevated-soft border border-transparent focus:border-white/20 rounded-full py-2.5 pl-10 pr-10 text-sm text-white placeholder:text-text-muted outline-none transition-all shadow-inner"
         />
