@@ -1,5 +1,6 @@
 package org.example.mappers.user;
 
+import org.example.dtos.user.GetAllUsersDTO;
 import org.example.dtos.user.UserRegisterDTO;
 import org.example.dtos.user.UserResponseDTO;
 import org.example.entities.user.UserEntity;
@@ -17,6 +18,8 @@ public interface UserMapper {
     default String map(UserEntity user) {
         return user != null ? user.getUsername() : null;
     }
+
+    List<GetAllUsersDTO> fromEntityGetAll(List<UserEntity> users);
 
     UserResponseDTO fromEntity(UserEntity user);
 

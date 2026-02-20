@@ -1,6 +1,8 @@
 package org.example.repositories.song;
 
 import org.example.entities.song.SongEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

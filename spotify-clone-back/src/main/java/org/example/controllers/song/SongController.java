@@ -2,6 +2,7 @@ package org.example.controllers.song;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
+import org.example.dtos.song.FavoriteSongDTO;
 import org.example.dtos.song.SongCreateDTO;
 import org.example.dtos.song.SongResponseDTO;
 import org.example.dtos.song.UpdateSongDTO;
@@ -9,6 +10,8 @@ import org.example.serverResponses.ServerResponse;
 import org.example.services.song.SongService;
 import org.example.utils.MultipartFileEditor;
 import org.hibernate.ObjectNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,8 +34,8 @@ public class SongController {
     private final SongService songService;
 
     @GetMapping(value = "/getAll")
-    public ResponseEntity<ServerResponse<List<SongResponseDTO>>> getAllSongs() {
-        return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse<List<SongResponseDTO>>("Успішно отримано пісні", songService.getAll()));
+    public ResponseEntity<ServerResponse<Page<SongResponseDTO>>> getAllSongs(Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse<Page<SongResponseDTO>>("Успішно отримано пісні", songService.getAll(pageable)));
     }
 
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -67,5 +70,12 @@ public class SongController {
         var success = songService.update(Long.valueOf(id), updateSongDTO);
         if(success) return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse<String>("Пісню успішно оновлено",null));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ServerResponse<String>("Сталася помилка або ви не маєте прав на редагування цієї пісні.",null));
+    }
+
+    @PostMapping("/favorite-song")
+    public ResponseEntity<?> favoriteSong(@RequestBody FavoriteSongDTO dto){
+        var success = songService.favoriteSong(dto.getId());
+        if(success) return ResponseEntity.status(HttpStatus.OK).body(null);
+        return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 }
