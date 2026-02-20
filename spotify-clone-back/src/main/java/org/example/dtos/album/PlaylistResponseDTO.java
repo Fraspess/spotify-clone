@@ -1,16 +1,13 @@
 package org.example.dtos.album;
 
-import jakarta.persistence.Column;
 import lombok.Data;
 import org.example.dtos.song.SongShortDTO;
-import org.example.entities.song.SongEntity;
-import org.example.entities.user.UserEntity;
 
 import java.time.LocalDate;
 import java.util.Set;
 
 @Data
-public class AlbumResponseDTO {
+public class PlaylistResponseDTO {
     private Long id;
 
     private String title;

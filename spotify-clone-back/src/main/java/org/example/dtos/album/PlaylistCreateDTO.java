@@ -2,14 +2,12 @@ package org.example.dtos.album;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import org.example.entities.song.SongEntity;
-import org.example.entities.user.UserEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Set;
 
 @Data
-public class AlbumCreateDTO {
+public class PlaylistCreateDTO {
     @NotNull
     private String title;
     @NotNull
