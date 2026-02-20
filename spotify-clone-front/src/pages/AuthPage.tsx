@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useDispatch } from 'react-redux';
 import { useLoginMutation, useRegisterMutation } from '../services/api';
 import { setCredentials } from '../services/authSlice';
+import { ArrowLeft } from "lucide-react";
 
 type Mode = 'login' | 'register'
 
@@ -82,16 +83,33 @@ const handleSubmit = async (e: SyntheticEvent) => {
       <div className="pointer-events-none absolute -top-32 -left-32 h-64 w-64 rounded-full bg-primary/20 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-40 -right-20 h-72 w-72 rounded-full bg-primary-soft/20 blur-3xl" />
 
-      <div className="relative w-full max-w-md">
+    <button
+      onClick={() => navigate('/')}
+      className="absolute top-8 left-8 flex items-center gap-2 text-text-muted hover:text-white transition-colors group z-50"
+    >
+      <div className="p-2 rounded-full bg-bg-elevated border border-border-subtle group-hover:border-primary/50 transition-all">
+        <ArrowLeft size={20} />
+      </div>
+      <span className="text-sm font-medium hidden sm:block">На головну</span>
+    </button>
+
+    <div className="relative w-full max-w-md">
         {/* Логотип зверху над формою */}
-        <div className="flex flex-col items-center mb-8">
+    <div className="flex flex-col items-center mb-8">
+      <div className="flex items-center justify-center mb-2">
           <img 
             src="/src/assets/logo/audiolab.png"
             alt="AudioLab" 
-            className="h-20 w-auto mb-3"
+            className="h-20 w-auto block select-none object-contain flex-shrink-0"
           />
-          <p className="text-sm text-text-muted">Увійдіть або створіть обліковий запис</p>
-        </div>
+
+          <span className="font-bold text-3xl tracking-tighter whitespace-nowrap leading-none -ml-2">
+            Audio<span className="text-primary">Lab</span>
+          </span>
+      </div>
+    
+    <p className="text-sm text-text-muted">Увійдіть або створіть обліковий запис</p>
+  </div>
 
         {/* Карточка форми */}
         <div className="bg-bg-elevated-soft/80 border border-border-subtle/80 rounded-2xl shadow-soft-xl p-6 md:p-7 backdrop-blur">
