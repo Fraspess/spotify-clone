@@ -1,27 +1,26 @@
-package org.example.entities.song;
+package org.example.entities.album;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.example.entities.album.AlbumEntity;
+import lombok.*;
+import org.example.entities.song.SongEntity;
 import org.example.entities.user.UserEntity;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Data
-@Table(name = "songs")
+@Getter
+@Setter
+@Table(name = "albums")
 @AllArgsConstructor
 @NoArgsConstructor
-@SQLDelete(sql = "UPDATE songs SET deleted = true WHERE id = ?")
+@SQLDelete(sql = "UPDATE albums SET deleted = true WHERE id = ?")
 @SQLRestriction("deleted = false")
-public class SongEntity {
+
+public class AlbumEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,35 +29,30 @@ public class SongEntity {
     private String title;
 
     @Column(nullable = false)
-    private Long durationInSeconds;
+    private LocalDate dateCreated;
 
-    @Column(nullable = false)
     private String image;
 
     @Column(nullable = false)
-    private String songFileName;
-
-    @Column(nullable = false)
-    private LocalDate release_date;
-
-    @Column(nullable = false)
     private boolean deleted = false;
-
-    @ManyToMany(mappedBy = "favoriteSongs")
-    private List<UserEntity> favoritedBy;
 
     @ManyToOne
     @JoinColumn(name = "artist_id", nullable = false)
     private UserEntity artist;
 
-    @ManyToMany(mappedBy = "songs")
-    private Set<AlbumEntity> albums;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "album_songs",
+            joinColumns = @JoinColumn(name = "album_id"),
+            inverseJoinColumns = @JoinColumn(name = "song_id")
+    )
+    private Set<SongEntity> songs = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof SongEntity)) return false;
-        return id != null && id.equals(((SongEntity) o).id);
+        if (!(o instanceof AlbumEntity)) return false;
+        return id != null && id.equals(((AlbumEntity) o).id);
     }
 
     @Override

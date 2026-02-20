@@ -1,4 +1,4 @@
-package org.example.services.user;
+package org.example.utils;
 
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,10 +17,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Service
-public class UserImagesService {
-    @Value("${user.images.dir}")
-    private String uploadDir;
-
+public class ImagesService {
     String extension = "webp";
 
     Map<String, Integer> sizes = Map.of(
@@ -29,18 +26,19 @@ public class UserImagesService {
             "large", 1000
     );
 
-    public String load(MultipartFile file) {
+
+    public String load(MultipartFile file, String uploadDir) {
         if (file.isEmpty()) return null;
 
         try (var inputStream = file.getInputStream()) {
-            return saveStreamToFile(inputStream);
+            return saveStreamToFile(inputStream,uploadDir);
         } catch (IOException e) {
             System.out.println("Problem saving image:" + e);
             return "";
         }
     }
 
-    public void remove(String fileName) {
+    public void remove(String fileName, String uploadDir) {
         try {
             for (var folder : sizes.keySet()) {
                 Path filePath = Paths.get(uploadDir, folder, fileName);
@@ -51,15 +49,15 @@ public class UserImagesService {
         }
     }
 
-    public String replace(String oldFileName, MultipartFile newFile) {
-        var newFileName = load(newFile);
-        if(newFileName.isEmpty())
+    public String replace(String oldFileName, MultipartFile newFile, String uploadDir) {
+        var newFileName = load(newFile, uploadDir);
+        if (newFileName.isEmpty())
             return oldFileName;
-        remove(oldFileName);
+        remove(oldFileName, uploadDir);
         return newFileName;
     }
 
-    private String saveStreamToFile(InputStream stream) throws IOException {
+    private String saveStreamToFile(InputStream stream, String uploadDir) throws IOException {
         Files.createDirectories(Paths.get(uploadDir));
         String fileName = UUID.randomUUID().toString() + "." + extension;
         var bufferedImage = ImageIO.read(stream);

@@ -10,6 +10,10 @@ import org.example.entities.user.UserEntity;
 import org.example.mappers.song.SongMapper;
 import org.example.repositories.song.ISongRepository;
 import org.example.repositories.user.IUserRepository;
+import org.example.utils.ImagesService;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -24,16 +28,19 @@ public class SongService {
     private final IUserRepository userRepository;
     private final SongMapper songMapper;
     private final SongFilesService songFilesService;
-    private final SongImagesService songImagesService;
+    private final ImagesService songImagesService;
 
-    public List<SongResponseDTO> getAll(){
-        var songs = songRepository.findAll();
-        return songMapper.fromEntityList(songs);
+    @Value("${music.images.dir}")
+    private String uploadImgDir;
+
+    public Page<SongResponseDTO> getAll(Pageable pageable){
+        Page<SongEntity> songs = songRepository.findAll(pageable);
+        return songs.map(songMapper::fromEntity);
     }
 
     private String loadSongImage(SongCreateDTO dto) {
         if (dto.getImageFile() != null) {
-            return songImagesService.load(dto.getImageFile());
+            return songImagesService.load(dto.getImageFile(),uploadImgDir);
         }
         return null;
     }
@@ -125,7 +132,7 @@ public class SongService {
         }
 
         if (dto.getImageFile() != null && !dto.getImageFile().isEmpty()) {
-            var fileName = songImagesService.replace(song.getImage(), dto.getImageFile());
+            var fileName = songImagesService.replace(song.getImage(), dto.getImageFile(), uploadImgDir);
             song.setImage(fileName);
         }
 
@@ -143,6 +150,34 @@ public class SongService {
             song.setSongFileName(audioDTO.getFileName());
         }
         songRepository.save(song);
+        return true;
+    }
+
+    private UserEntity getUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("AUTH AFTER FILTER: " + SecurityContextHolder.getContext().getAuthentication());
+        if (authentication == null) return null;
+
+        String email = authentication.getName();
+        var userOpt = userRepository.findByEmail(email);
+        return userOpt.orElse(null);
+
+    }
+
+    public boolean favoriteSong(Long id) {
+        var user = getUser();
+        if (user == null) return false;
+
+        var songOpt = songRepository.findById(id);
+        if (songOpt.isEmpty()) return false;
+        var song = songOpt.get();
+        var favorites = user.getFavoriteSongs();
+        if (favorites.contains(song)) {
+            favorites.remove(song);
+        } else {
+            user.getFavoriteSongs().add(song);
+        }
+        userRepository.save(user);
         return true;
     }
 }

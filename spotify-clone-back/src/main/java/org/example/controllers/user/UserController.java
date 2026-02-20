@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.catalina.User;
 import org.example.dtos.song.FavoriteSongDTO;
 import org.example.dtos.token.TokenDTO;
-import org.example.dtos.user.UserLoginDTO;
-import org.example.dtos.user.UserRegisterDTO;
-import org.example.dtos.user.UserResponseDTO;
-import org.example.dtos.user.UserUpdateDTO;
+import org.example.dtos.user.*;
 import org.example.serverResponses.ServerResponse;
 import org.example.serverResponses.user.AuthResponse;
 import org.example.services.user.UserService;
@@ -83,9 +80,9 @@ public class UserController {
     }
 
     @GetMapping("/getAll")
-    public ResponseEntity<ServerResponse<List<UserResponseDTO>>> getAll(){
+    public ResponseEntity<ServerResponse<List<GetAllUsersDTO>>> getAll(){
         var users = userService.getAll();
-        return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse<List<UserResponseDTO>>("Успішно отримано всіх користувачів.", users));
+        return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse<List<GetAllUsersDTO>>("Успішно отримано всіх користувачів.", users));
     }
 
     @GetMapping("/getByUsername")
@@ -101,11 +98,5 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(new AuthResponse("Успішно",newTokens));
     }
 
-    @PostMapping("/favorite")
-    public ResponseEntity<?> favoriteSong(@RequestBody FavoriteSongDTO dto){
-        var success = userService.favoriteSong(dto.getId());
-        if(success) return ResponseEntity.status(HttpStatus.OK).body(null);
-        return ResponseEntity.status(HttpStatus.OK).body(null);
-    }
 }
 
