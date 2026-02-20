@@ -1,6 +1,7 @@
 package org.example.controllers.playlist;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.Server;
 import org.example.dtos.playlist.PlaylistAddSongDTO;
 import org.example.dtos.playlist.PlaylistCreateDTO;
 import org.example.dtos.playlist.PlaylistResponseDTO;
@@ -26,30 +27,37 @@ public class PlaylistController {
     public void initBinder(WebDataBinder binder) {
         binder.registerCustomEditor(MultipartFile.class, new MultipartFileEditor());
     }
+
     @GetMapping("/getAll")
-    public ResponseEntity<ServerResponse<Page<PlaylistResponseDTO>>> getAll(Pageable pageable){
-        var playlists = playlistService.getAll(pageable);
-        return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse<Page<PlaylistResponseDTO>>("Успішно отримано плейлисти",playlists));
+    public ResponseEntity<ServerResponse<?>> getAll(Pageable pageable) {
+        Page<PlaylistResponseDTO> playlists = playlistService.getAll(pageable);
+        return ResponseEntity.ok(
+                new ServerResponse<>("Успішно отримано плейлисти", playlists)
+        );
     }
 
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ServerResponse<String>> create(@ModelAttribute PlaylistCreateDTO dto){
-        var success = playlistService.create(dto);
-        if(success) return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse<String>("Успішно створено плейлист.",null));
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ServerResponse<String>("Сталася помилка",null));
+    public ResponseEntity<ServerResponse<?>> create(@ModelAttribute PlaylistCreateDTO dto) {
+        playlistService.create(dto);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(new ServerResponse<>("Успішно створено плейлист.", null));
     }
+
 
     @PostMapping("/addSong")
-    public ResponseEntity<ServerResponse<String>> addSongToPlaylist(@RequestBody PlaylistAddSongDTO dto){
-        var success = playlistService.addSongToPlaylist(dto);
-        if(success) return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse<String>("Успішно додано пісню до плейлиста",null));
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ServerResponse<String>("Сталася помилка",null));
+    public ResponseEntity<ServerResponse<?>> addSongToPlaylist(@RequestBody PlaylistAddSongDTO dto) {
+        return ResponseEntity.ok(
+                new ServerResponse<>("Успішно додано пісню до плейлиста", null)
+        );
     }
 
-    @DeleteMapping("delete")
-    public ResponseEntity<?> deleteById(@RequestParam Long id){
-        var success = playlistService.deleteById(id);
-        if(success) return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse<String>("Успішно видалено плейлист",null));
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ServerResponse<String>("Сталася помилка",null));
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<ServerResponse<?>> deleteById(@RequestParam Long id) {
+        playlistService.deleteById(id);
+        return ResponseEntity.ok(
+                new ServerResponse<>("Успішно видалено плейлист", null)
+        );
     }
 }

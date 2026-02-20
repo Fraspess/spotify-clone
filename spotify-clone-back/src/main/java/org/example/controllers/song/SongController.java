@@ -33,49 +33,56 @@ public class SongController {
 
     private final SongService songService;
 
-    @GetMapping(value = "/getAll")
-    public ResponseEntity<ServerResponse<Page<SongResponseDTO>>> getAllSongs(Pageable pageable) {
-        return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse<Page<SongResponseDTO>>("Успішно отримано пісні", songService.getAll(pageable)));
+    @GetMapping("/getAll")
+    public ResponseEntity<ServerResponse<?>> getAllSongs(Pageable pageable) {
+        Page<SongResponseDTO> songs = songService.getAll(pageable);
+
+        return ResponseEntity.ok(
+                new ServerResponse<>(null, songs)
+        );
     }
 
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ServerResponse<String>> createSong(@ModelAttribute SongCreateDTO dto) {
-        var result = songService.createSong(dto);
-        if (result) {
-            return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse<String>("Успішно створенно пісню", null));
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ServerResponse<String>("Невірно передані дані", null));
-        }
+    public ResponseEntity<ServerResponse<?>> createSong(@ModelAttribute SongCreateDTO dto) {
+        songService.createSong(dto);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(new ServerResponse<>("Пісню успішно створено", null));
+
     }
 
-    @GetMapping("/getBy")
-    public ResponseEntity<ServerResponse<SongResponseDTO>> getById(@RequestParam(value = "id") String id) {
-        var song = songService.getById(Long.valueOf(id));
-        if (song == null)
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ServerResponse<SongResponseDTO>("Пісню не знайдено", null));
-        return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse<SongResponseDTO>("Успішно отримано пісню", song));
+    @GetMapping("/getById")
+    public ResponseEntity<ServerResponse<?>> getById(@RequestParam("id") Long id) {
+        var song = songService.getById(id);
+        return ResponseEntity.ok(
+                new ServerResponse<>(null, song)
+        );
     }
 
-    @DeleteMapping(value = "/delete")
-    public ResponseEntity<ServerResponse<String>> deleteById(@RequestParam(value = "id") String idS) {
-        var id = Integer.parseInt(idS);
-        var success = songService.deleteById((long) id);
-        if (success)
-            return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse<String>("Успішо видалено пісню якщо її знайдено", null));
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ServerResponse<String>("Помилка при видалені. У вас немає прав або пісні не існує.", null));
+    @DeleteMapping("/delete")
+    public ResponseEntity<ServerResponse<?>> deleteById(@RequestParam("id") Long id) {
+
+        songService.deleteById(id);
+        return ResponseEntity.ok(
+                new ServerResponse<>("Пісню успішно видалено", null));
     }
 
     @PutMapping(value = "/update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ServerResponse<String>> updateById(@PathVariable String id, @ModelAttribute UpdateSongDTO updateSongDTO) {
-        var success = songService.update(Long.valueOf(id), updateSongDTO);
-        if(success) return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse<String>("Пісню успішно оновлено",null));
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ServerResponse<String>("Сталася помилка або ви не маєте прав на редагування цієї пісні.",null));
+    public ResponseEntity<ServerResponse<?>> updateById(
+            @PathVariable Long id,
+            @ModelAttribute UpdateSongDTO updateSongDTO) {
+
+        songService.update(id, updateSongDTO);
+
+        return ResponseEntity.ok(
+                new ServerResponse<>("Пісню успішно оновлено", null));
     }
 
     @PostMapping("/favorite-song")
-    public ResponseEntity<?> favoriteSong(@RequestBody FavoriteSongDTO dto){
-        var success = songService.favoriteSong(dto.getId());
-        if(success) return ResponseEntity.status(HttpStatus.OK).body(null);
-        return ResponseEntity.status(HttpStatus.OK).body(null);
+    public ResponseEntity<ServerResponse<?>> favoriteSong(@RequestBody FavoriteSongDTO dto) {
+        songService.favoriteSong(dto.getId());
+
+        return ResponseEntity.ok(
+                new ServerResponse<>("Пісню додано до улюблених", null));
     }
 }

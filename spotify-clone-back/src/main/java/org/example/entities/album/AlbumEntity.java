@@ -6,11 +6,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.entities.playlist.PlaylistEntity;
+import org.example.entities.song.SongEntity;
 import org.example.entities.user.UserEntity;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -37,6 +39,15 @@ public class AlbumEntity {
     @ManyToOne
     @JoinColumn(name = "artist_id",nullable = false)
     private UserEntity artist;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "album_songs",
+            joinColumns = @JoinColumn(name = "album_id"),
+            inverseJoinColumns = @JoinColumn(name = "song_id")
+    )
+    private Set<SongEntity> songs;
+
 
     @Override
     public boolean equals(Object o) {

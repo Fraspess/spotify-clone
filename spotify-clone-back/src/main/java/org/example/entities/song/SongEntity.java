@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.entities.album.AlbumEntity;
 import org.example.entities.playlist.PlaylistEntity;
 import org.example.entities.user.UserEntity;
 import org.hibernate.annotations.SQLDelete;
@@ -53,6 +54,8 @@ public class SongEntity {
     @ManyToMany(mappedBy = "songs")
     private Set<PlaylistEntity> playlists;
 
+    @ManyToMany(mappedBy = "songs")
+    private Set<AlbumEntity> albums;
 
     @Override
     public boolean equals(Object o) {
