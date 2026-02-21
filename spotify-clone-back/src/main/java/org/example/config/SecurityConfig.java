@@ -1,5 +1,6 @@
 package org.example.config;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +18,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
 @RequiredArgsConstructor
@@ -34,6 +36,7 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final UserDetailsService userDetailsService;
     private final AccessDeniedHandler accessDeniedHandler;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http
@@ -58,12 +61,13 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/songs/getAll").permitAll()
                         .requestMatchers("/api/test/hello").permitAll()
+                        .requestMatchers("/api/users/getById/**").permitAll()
                         .requestMatchers("/api/songs/getById/**").permitAll()
                         .requestMatchers("/api/users/getByUsername/**").permitAll()
                         .requestMatchers("/api/users/getAll").permitAll()
+                        .requestMatchers("/api/playlists/getAll").permitAll()
                         .requestMatchers("/api/albums/getAll").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/songs/create")
-                        .hasRole("USER")
+                        .requestMatchers(HttpMethod.POST, "/api/songs/create").permitAll()
 
 
 
@@ -71,10 +75,18 @@ public class SecurityConfig {
                 )
                 .userDetailsService(userDetailsService)
                 .authenticationProvider(authenticationProvider)
-                .exceptionHandling(e -> e.accessDeniedHandler(accessDeniedHandler)
-                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
-
+                .exceptionHandling(e -> e
+                        .accessDeniedHandler(accessDeniedHandler)
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setContentType("application/json");
+                            response.setCharacterEncoding("UTF-8");
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.getWriter().write("{\"message\": \"Ви не авторизовані\", \"data\": null}");
+                        }))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-                return http.build();
+
+        return http.build();
+
+
     }
 }

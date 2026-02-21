@@ -10,10 +10,12 @@ import org.example.entities.user.UserEntity;
 import org.example.mappers.song.SongMapper;
 import org.example.repositories.song.ISongRepository;
 import org.example.repositories.user.IUserRepository;
+import org.example.utils.AuthService;
 import org.example.utils.ImagesService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -29,18 +31,19 @@ public class SongService {
     private final SongMapper songMapper;
     private final SongFilesService songFilesService;
     private final ImagesService songImagesService;
+    private final AuthService authService;
 
     @Value("${music.images.dir}")
     private String uploadImgDir;
 
-    public Page<SongResponseDTO> getAll(Pageable pageable){
+    public Page<SongResponseDTO> getAll(Pageable pageable) {
         Page<SongEntity> songs = songRepository.findAll(pageable);
         return songs.map(songMapper::fromEntity);
     }
 
     private String loadSongImage(SongCreateDTO dto) {
         if (dto.getImageFile() != null) {
-            return songImagesService.load(dto.getImageFile(),uploadImgDir);
+            return songImagesService.load(dto.getImageFile(), uploadImgDir);
         }
         return null;
     }
@@ -51,50 +54,37 @@ public class SongService {
         }
         return null;
     }
-    private void validateSong(SongCreateDTO dto) {
-        if ((dto.getSongFile() == null || dto.getSongFile().isEmpty())){
-            throw new IllegalArgumentException("Either a song file or a song URL must be provided");
-        }
-    }
-    public boolean createSong(SongCreateDTO dto){
-        validateSong(dto);
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("AUTH AFTER FILTER: " + SecurityContextHolder.getContext().getAuthentication());
-        if (authentication == null) return false;
-        String email = authentication.getName();
 
-        Optional<UserEntity> userOpt = userRepository.findByEmail(email);
-        if(userOpt.isEmpty()){
-            return false;
-        }
-        var user = userOpt.get();
 
-        // мапимо пісню
+    public void createSong(SongCreateDTO dto) {
+        var user = authService.getUser();
+
         var song = songMapper.fromCreateDto(dto);
-        // ставимо айди користувача який створив пісню
+
         song.setArtist(user);
 
         String imageFileName = loadSongImage(dto);
-        if (imageFileName != null) {
-            song.setImage(imageFileName);
-        }
-
         AudioFileDTO audioDto = loadSongFile(dto);
-        if (audioDto != null) {
-            System.out.println("NOT NULL");
-            song.setSongFileName(audioDto.getFileName());
-            song.setDurationInSeconds(audioDto.getDuration());
+        if (imageFileName == null || audioDto == null) {
+            throw new IllegalArgumentException("Невірні формати файлів");
         }
+
+        song.setImage(imageFileName);
+        System.out.println("NOT NULL");
+        song.setSongFileName(audioDto.getFileName());
+        song.setDurationInSeconds(audioDto.getDuration());
+
+
         songRepository.save(song);
-        return true;
+
     }
 
-    public SongResponseDTO getById(Long id){
-        var songOpt = songRepository.findById(id);
-        return songOpt.map(songMapper::fromEntity).orElse(null);
+    public SongResponseDTO getById(Long id) {
+        var song = songRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Пісню не знайдено"));
+        return songMapper.fromEntity(song);
     }
 
-    private boolean validateUserRights(Long entityOwnerId){
+    private boolean validateUserRights(Long entityOwnerId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         System.out.println("AUTH AFTER FILTER: " + SecurityContextHolder.getContext().getAuthentication());
         if (authentication == null) return true;
@@ -104,25 +94,20 @@ public class SongService {
         if (userOpt.isEmpty()) return true;
 
         var user = userOpt.get();
-        if(entityOwnerId != user.getId()) System.out.println("NOT OWNER");
+        if (entityOwnerId != user.getId()) System.out.println("NOT OWNER");
         return entityOwnerId == user.getId();
     }
 
-    public boolean deleteById(Long id){
-        var songOpt = songRepository.findById(id);
-        if(songOpt.isEmpty()) return false;
-        var song = songOpt.get();
-        if(!validateUserRights(song.getArtist().getId())) return false;
+    public void deleteById(Long id) {
+        var song = songRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Пісню не знайдено"));
+        if (!validateUserRights(song.getArtist().getId())) throw new AccessDeniedException("Заборонено");
         songRepository.deleteById(id);
-        return true;
     }
 
+    public void update(Long id, UpdateSongDTO dto) {
+        var song = songRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Пісню не знайдено"));
+        if (!validateUserRights(song.getArtist().getId())) throw new AccessDeniedException("Заборонено");
 
-    public boolean update(Long id,UpdateSongDTO dto){
-        Optional<SongEntity> songOpt = songRepository.findById(id);
-        if (songOpt.isEmpty()) return false;
-        var song = songOpt.get();
-        if(!validateUserRights(song.getArtist().getId())) return false;
         if (dto.getTitle() != null) {
             song.setTitle(dto.getTitle());
         }
@@ -144,33 +129,19 @@ public class SongService {
                 song.setSongFileName(audioDTO.getFileName());
             } else {
                 System.out.println("Audio file processing failed.");
-                return false;
+                throw new IllegalArgumentException("Файл не прошов аудіо перетворення");
             }
             song.setDurationInSeconds(audioDTO.getDuration());
             song.setSongFileName(audioDTO.getFileName());
         }
         songRepository.save(song);
-        return true;
     }
 
-    private UserEntity getUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("AUTH AFTER FILTER: " + SecurityContextHolder.getContext().getAuthentication());
-        if (authentication == null) return null;
+    public void favoriteSong(Long id) {
+        var user = authService.getUser();
 
-        String email = authentication.getName();
-        var userOpt = userRepository.findByEmail(email);
-        return userOpt.orElse(null);
+        var song = songRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Пісню не знайдено"));
 
-    }
-
-    public boolean favoriteSong(Long id) {
-        var user = getUser();
-        if (user == null) return false;
-
-        var songOpt = songRepository.findById(id);
-        if (songOpt.isEmpty()) return false;
-        var song = songOpt.get();
         var favorites = user.getFavoriteSongs();
         if (favorites.contains(song)) {
             favorites.remove(song);
@@ -178,6 +149,5 @@ public class SongService {
             user.getFavoriteSongs().add(song);
         }
         userRepository.save(user);
-        return true;
     }
 }

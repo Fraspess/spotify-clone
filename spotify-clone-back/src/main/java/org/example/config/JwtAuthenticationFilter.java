@@ -8,7 +8,9 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.example.services.customUserDetails.CustomUserDetailsService;
 import org.example.services.jwt.JwtService;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -36,7 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String jwt;
         final String userId;
 
-        if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -58,10 +60,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                     System.out.println("Authorities in SecurityContext: " +
                             SecurityContextHolder.getContext().getAuthentication().getAuthorities());
+                } else {
+                    throw new BadCredentialsException("");
                 }
+
+
             }
+
         } catch (Exception e) {
-            System.out.println("JWT error: " + e.getMessage());
+            SecurityContextHolder.clearContext();
+            filterChain.doFilter(request, response);
+            return;
         }
         filterChain.doFilter(request, response);
     }

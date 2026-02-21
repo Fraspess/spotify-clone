@@ -3,6 +3,7 @@ package org.example.entities.user;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
+import org.example.entities.album.AlbumEntity;
 import org.example.entities.playlist.PlaylistEntity;
 import org.example.entities.song.SongEntity;
 import org.hibernate.annotations.SQLDelete;
@@ -54,14 +55,16 @@ public class UserEntity {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "song_id")
     )
-    private List<SongEntity> favoriteSongs;
+    private Set<SongEntity> favoriteSongs;
 
     @OneToMany(mappedBy = "artist", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<SongEntity> songs;
+    private Set<SongEntity> songs;
 
     @OneToMany(mappedBy = "artist", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<PlaylistEntity> playlists;
 
+    @OneToMany(mappedBy = "artist", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<AlbumEntity> albums;
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

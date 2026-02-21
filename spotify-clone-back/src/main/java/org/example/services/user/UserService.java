@@ -8,12 +8,16 @@ import org.example.repositories.role.IRoleRepository;
 import org.example.repositories.song.ISongRepository;
 import org.example.repositories.user.IUserRepository;
 import org.example.services.jwt.JwtService;
+import org.example.utils.AuthService;
 import org.example.utils.ImagesService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
@@ -27,23 +31,22 @@ public class UserService {
     private final JwtService jwtService;
     private final IRoleRepository roleRepository;
     private final ImagesService userImagesService;
+    private final AuthService authService;
 
     @Value("${user.images.dir}")
     private String uploadImgDir;
 
     public Map<String, String> register(UserRegisterDTO dto) {
         if (userRepository.existsByEmail(dto.getEmail())) {
-            return null;
+            throw new IllegalArgumentException("Почта занята");
         }
-        if(userRepository.existsByUsername(dto.getUsername())){
-            return null;
+        if (userRepository.existsByUsername(dto.getUsername())) {
+            throw new IllegalArgumentException("Юзернейм вже зайнятий");
         }
         var user = userMapper.fromRegisterDTO(dto);
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
 
-        var roleOpt = roleRepository.findByName("USER");
-        if (roleOpt.isEmpty()) return null;
-        var role = roleOpt.get();
+        var role = roleRepository.findByName("USER").orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Нема ролі юзер????"));
         user.getRoles().add(role);
         userRepository.save(user);
         return jwtService.generateRefreshAccessTokens(user);
@@ -51,52 +54,26 @@ public class UserService {
 
 
     public Map<String, String> login(UserLoginDTO dto) {
-        var userOptEmail = userRepository.findByEmail(dto.getLogin());
-        var userOptUsername = userRepository.findByUsername(dto.getLogin());
-        if (userOptEmail.isPresent()) {
-            var user = userOptEmail.get();
-            var password = user.getPassword();
-            if (passwordEncoder.matches(dto.getPassword(), password)) {
-                return jwtService.generateRefreshAccessTokens(user);
-            } else {
-                return null;
-            }
-        } else if (userOptUsername.isPresent()) {
-            var user = userOptUsername.get();
-            var password = user.getPassword();
-            if (passwordEncoder.matches(dto.getPassword(), password)) {
-                return jwtService.generateRefreshAccessTokens(user);
-            } else {
-                return null;
-            }
+        var userOpt = userRepository.findByEmail(dto.getLogin())
+                .or(() -> userRepository.findByUsername(dto.getLogin()));
+        var user = userOpt.orElseThrow(() -> new IllegalArgumentException("Невірний логін або пароль"));
+        var password = user.getPassword();
+        if (passwordEncoder.matches(dto.getPassword(), password)) {
+            return jwtService.generateRefreshAccessTokens(user);
         } else {
-            return null;
+            throw new IllegalArgumentException("Невірний логін або пароль");
         }
-
     }
 
-    private UserEntity getUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("AUTH AFTER FILTER: " + SecurityContextHolder.getContext().getAuthentication());
-        if (authentication == null) return null;
-
-        String email = authentication.getName();
-        var userOpt = userRepository.findByEmail(email);
-        return userOpt.orElse(null);
-
-    }
-
-    public boolean disable() {
-        var user = getUser();
-        if (user == null) return false;
+    public void disable() {
+        var user = authService.getUser();
         userRepository.deleteById(user.getId());
-        return true;
     }
 
 
-    public boolean update(UserUpdateDTO dto) {
-        var user = getUser();
-        if (user == null) return false;
+    public void update(UserUpdateDTO dto) {
+        var user = authService.getUser();
+
         if (dto.getUsername() != null && !dto.getUsername().isEmpty()) {
             user.setUsername(dto.getUsername());
         }
@@ -108,7 +85,6 @@ public class UserService {
             user.setImage(fileName);
         }
         userRepository.save(user);
-        return true;
     }
 
     public List<GetAllUsersDTO> getAll() {
@@ -118,7 +94,11 @@ public class UserService {
 
     public UserResponseDTO getByUsername(String username) {
         var userOpt = userRepository.findByUsername(username);
-        return userMapper.fromEntity(userOpt.orElse(null));
+        return userMapper.fromEntity(userOpt.orElseThrow(() -> new IllegalArgumentException("Юзера не знайдено")));
+    }
+
+    public UserResponseDTO getById(Long id){
+        return userMapper.fromEntity(userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Юзера не знайдено")));
     }
 
     public Map<String, String> refresh(String refresh) {
