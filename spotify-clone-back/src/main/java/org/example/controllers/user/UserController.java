@@ -12,6 +12,8 @@ import org.example.utils.MultipartFileEditor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -93,9 +95,10 @@ public class UserController {
         );
     }
 
-    @GetMapping("getById")
+    @GetMapping("/getById")
     public ResponseEntity<ServerResponse<?>> getById(@RequestParam Long id){
         return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse<>(true,"Успішно",userService.getById(id)));
     }
+
 }
 

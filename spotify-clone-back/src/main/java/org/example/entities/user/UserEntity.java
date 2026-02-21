@@ -33,10 +33,8 @@ public class UserEntity {
     @Email(message = "Невалідний email")
     private String email;
 
-    @Column(nullable = true)
     private String image;
 
-    @Column(nullable = false)
     private String password;
 
     private boolean deleted = false;

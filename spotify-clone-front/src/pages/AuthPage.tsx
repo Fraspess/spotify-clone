@@ -48,7 +48,7 @@ const handleSubmit = async (e: SyntheticEvent) => {
           }).unwrap();
         }
         
-        const token = result?.accessToken || result?.token;
+        const token = result?.data.accessToken || result?.data.token;
 
         if (token) {
               const authData = {
