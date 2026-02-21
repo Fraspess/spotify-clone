@@ -6,14 +6,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.Set;
+
 @Data
-public class AlbumCreateDTO {
+public class AlbumUpdateDTO {
     @NotNull
+    private Long albumId;
     private String title;
-    @NotNull
     private LocalDate releaseDate;
-    @NotNull
-    private Set<Long> songs;
-    @NotNull
+    private Set<Long> songId;
     private MultipartFile image;
 }

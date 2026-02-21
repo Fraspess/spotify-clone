@@ -67,6 +67,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/getAll").permitAll()
                         .requestMatchers("/api/playlists/getAll").permitAll()
                         .requestMatchers("/api/albums/getAll").permitAll()
+                        .requestMatchers("/api/albums/getById/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/songs/create").permitAll()
 
 
