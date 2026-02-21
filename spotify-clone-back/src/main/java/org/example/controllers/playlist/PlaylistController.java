@@ -32,7 +32,7 @@ public class PlaylistController {
     public ResponseEntity<ServerResponse<?>> getAll(Pageable pageable) {
         Page<PlaylistResponseDTO> playlists = playlistService.getAll(pageable);
         return ResponseEntity.ok(
-                new ServerResponse<>("Успішно отримано плейлисти", playlists)
+                new ServerResponse<>(true,"Успішно отримано плейлисти", playlists)
         );
     }
 
@@ -41,14 +41,14 @@ public class PlaylistController {
         playlistService.create(dto);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(new ServerResponse<>("Успішно створено плейлист.", null));
+                .body(new ServerResponse<>(true,"Успішно створено плейлист.", null));
     }
 
 
     @PostMapping("/addSong")
     public ResponseEntity<ServerResponse<?>> addSongToPlaylist(@RequestBody PlaylistAddSongDTO dto) {
         return ResponseEntity.ok(
-                new ServerResponse<>("Успішно додано пісню до плейлиста", null)
+                new ServerResponse<>(true,"Успішно додано пісню до плейлиста", null)
         );
     }
 
@@ -57,7 +57,7 @@ public class PlaylistController {
     public ResponseEntity<ServerResponse<?>> deleteById(@RequestParam Long id) {
         playlistService.deleteById(id);
         return ResponseEntity.ok(
-                new ServerResponse<>("Успішно видалено плейлист", null)
+                new ServerResponse<>(true,"Успішно видалено плейлист", null)
         );
     }
 }

@@ -38,7 +38,7 @@ public class SongController {
         Page<SongResponseDTO> songs = songService.getAll(pageable);
 
         return ResponseEntity.ok(
-                new ServerResponse<>(null, songs)
+                new ServerResponse<>(true,null, songs)
         );
     }
 
@@ -47,7 +47,7 @@ public class SongController {
         songService.createSong(dto);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(new ServerResponse<>("Пісню успішно створено", null));
+                .body(new ServerResponse<>(true,"Пісню успішно створено", null));
 
     }
 
@@ -55,7 +55,7 @@ public class SongController {
     public ResponseEntity<ServerResponse<?>> getById(@RequestParam("id") Long id) {
         var song = songService.getById(id);
         return ResponseEntity.ok(
-                new ServerResponse<>(null, song)
+                new ServerResponse<>(true,null, song)
         );
     }
 
@@ -64,7 +64,7 @@ public class SongController {
 
         songService.deleteById(id);
         return ResponseEntity.ok(
-                new ServerResponse<>("Пісню успішно видалено", null));
+                new ServerResponse<>(true,"Пісню успішно видалено", null));
     }
 
     @PutMapping(value = "/update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -75,7 +75,7 @@ public class SongController {
         songService.update(id, updateSongDTO);
 
         return ResponseEntity.ok(
-                new ServerResponse<>("Пісню успішно оновлено", null));
+                new ServerResponse<>(true,"Пісню успішно оновлено", null));
     }
 
     @PostMapping("/favorite-song")
@@ -83,6 +83,6 @@ public class SongController {
         songService.favoriteSong(dto.getId());
 
         return ResponseEntity.ok(
-                new ServerResponse<>("Пісню додано до улюблених", null));
+                new ServerResponse<>(true,"Пісню додано до улюблених", null));
     }
 }

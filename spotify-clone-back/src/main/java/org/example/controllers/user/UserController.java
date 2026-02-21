@@ -35,7 +35,7 @@ public class UserController {
         var token = userService.register(dto);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(new ServerResponse<>("Реєстрація успішна", token));
+                .body(new ServerResponse<>(true,"Реєстрація успішна", token));
     }
 
 
@@ -43,7 +43,7 @@ public class UserController {
     public ResponseEntity<ServerResponse<?>> login(@RequestBody UserLoginDTO dto) {
         var token = userService.login(dto);
         return ResponseEntity.ok(
-                new ServerResponse<>("Успішний вхід в систему", token)
+                new ServerResponse<>(true,"Успішний вхід в систему", token)
         );
 
     }
@@ -52,7 +52,7 @@ public class UserController {
     public ResponseEntity<ServerResponse<?>> update(@ModelAttribute UserUpdateDTO dto) {
         userService.update(dto);
         return ResponseEntity.ok(
-                new ServerResponse<>("Успішно оновлено профіль користувача", null)
+                new ServerResponse<>(true,"Успішно оновлено профіль користувача", null)
         );
 
     }
@@ -62,7 +62,7 @@ public class UserController {
         userService.disable();
 
         return ResponseEntity.ok(
-                new ServerResponse<>("Аккаунт успішно виключено", null)
+                new ServerResponse<>(true,"Аккаунт успішно виключено", null)
         );
 
     }
@@ -72,7 +72,7 @@ public class UserController {
         var users = userService.getAll();
 
         return ResponseEntity.ok(
-                new ServerResponse<>("Успішно отримано всіх користувачів", users)
+                new ServerResponse<>(true,"Успішно отримано всіх користувачів", users)
         );
     }
 
@@ -80,7 +80,7 @@ public class UserController {
     public ResponseEntity<ServerResponse<?>> getByUsername(@RequestParam String username) {
         var user = userService.getByUsername(username);
         return ResponseEntity.ok(
-                new ServerResponse<>("Користувача знайдено", user)
+                new ServerResponse<>(true,"Користувача знайдено", user)
         );
     }
 
@@ -89,13 +89,13 @@ public class UserController {
         var newTokens = userService.refresh(dto.getToken());
 
         return ResponseEntity.ok(
-                new ServerResponse<>("Токен успішно оновлено", newTokens)
+                new ServerResponse<>(true,"Токен успішно оновлено", newTokens)
         );
     }
 
     @GetMapping("getById")
     public ResponseEntity<ServerResponse<?>> getById(@RequestParam Long id){
-        return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse<>("Успішно",userService.getById(id)));
+        return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse<>(true,"Успішно",userService.getById(id)));
     }
 }
 
