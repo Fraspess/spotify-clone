@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -105,5 +106,23 @@ public class UserService {
         return jwtService.refreshAccessToken(refresh);
     }
 
+
+    public Map<String,String> googleAuth(String email){
+        var userOpt = userRepository.findByEmail(email);
+        if(userOpt.isEmpty()){
+            var newUser = new UserEntity();
+            newUser.setEmail(email);
+            newUser.setUsername(email.split("@")[0]);
+
+            var userRole = roleRepository.findByName("USER").orElseThrow(() -> new IllegalArgumentException("Немає ролі юзер????"));
+            newUser.getRoles().add(userRole);
+            userRepository.save(newUser);
+            return jwtService.generateRefreshAccessTokens(newUser);
+        }else{
+            var user = userOpt.get();
+            return jwtService.generateRefreshAccessTokens(user);
+        }
+
+    }
 
 }
