@@ -100,5 +100,17 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse<>(true,"Успішно",userService.getById(id)));
     }
 
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ServerResponse<?>> forgotPassword(@ModelAttribute ForgotPasswordDTO dto){
+        userService.forgotPassword(dto.getEmail());
+        return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse<>(true, "На вказану почту відправлено лист якщо аккаунт знайдено", null));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<ServerResponse<?>> resetPassword(@ModelAttribute ResetPasswordDTO dto){
+        userService.resetPassword(dto);
+        return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse<>(true, "Пароль успішно змінений", null));
+    }
+
 }
 

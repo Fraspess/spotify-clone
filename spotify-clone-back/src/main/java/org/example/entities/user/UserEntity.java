@@ -39,6 +39,8 @@ public class UserEntity {
 
     private boolean deleted = false;
 
+    private String resetPasswordToken;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",
