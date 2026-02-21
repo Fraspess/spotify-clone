@@ -2,6 +2,7 @@ package org.example.dtos.user;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.example.dtos.album.AlbumResponseDTO;
 import org.example.dtos.playlist.PlaylistResponseDTO;
 import org.example.dtos.song.SongShortDTO;
 
@@ -17,6 +18,6 @@ public class UserResponseDTO {
 
     private Set<SongShortDTO> songs = new HashSet<>();
     private Set<SongShortDTO> favoriteSongs = new HashSet<>();
-    private Set<PlaylistResponseDTO> albums = new HashSet<>();
-
+    private Set<PlaylistResponseDTO> playlists = new HashSet<>();
+    private Set<AlbumResponseDTO> albums = new HashSet<>();
 }
