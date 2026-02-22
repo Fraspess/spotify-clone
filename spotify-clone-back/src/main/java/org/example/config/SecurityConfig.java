@@ -92,6 +92,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/albums/getById/**").permitAll()
                                 .requestMatchers("/api/users/reset-password").permitAll()
                                 .requestMatchers("/api/users/forgot-password").permitAll()
+                                .requestMatchers("/api/songs/search/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/songs/create").permitAll()
 
 

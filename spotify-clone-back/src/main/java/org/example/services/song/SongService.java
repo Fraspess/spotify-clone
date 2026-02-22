@@ -150,4 +150,8 @@ public class SongService {
         }
         userRepository.save(user);
     }
+
+    public List<SongResponseDTO> search(String q) {
+        return songMapper.fromEntityList(songRepository.search(q));
+    }
 }
