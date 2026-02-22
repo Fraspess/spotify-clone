@@ -16,7 +16,9 @@ function AuthPage() {
   const [register, { isLoading: isRegisterLoading }] = useRegisterMutation()
   const modeFromUrl = searchParams.get('mode') as Mode
   const [mode, setMode] = useState<Mode>(modeFromUrl || 'login')
-  
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [serverError, setServerError] = useState<string | null>(null)
+
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -27,55 +29,77 @@ function AuthPage() {
   useEffect(() => {
     if (modeFromUrl) {
       setMode(modeFromUrl)
+      setErrors({})
+      setServerError(null)
     }
   }, [modeFromUrl])
 
-const handleSubmit = async (e: SyntheticEvent) => {
-      e.preventDefault();
-      
-      try {
-        let result: any;
-        if (mode === 'login') {
-          result = await login({ 
-            login: formData.email,
-            password: formData.password 
-          }).unwrap();
-        } else {
-          result = await register({
-            username: formData.username,
-            email: formData.email,
-            password: formData.password
-          }).unwrap();
-        }
-        
-        const token = result?.data.accessToken || result?.data.token;
+  const validateForm = () => {
+      const newErrors: { [key: string]: string } = {}
 
-        if (token) {
-              const authData = {
-                user: result.user || { 
-                  email: formData.email, 
-                  username: formData.username || result.username 
-                },
-                token: token
-              };
-
-              dispatch(setCredentials(authData));
-              navigate('/');
-            }
-        
-      } catch (err: any) {
-        const errorMessage = err.data?.message || 'Помилка валідації. Перевірте дані.';
-        alert(errorMessage);
-        console.error('Деталі помилки:', err.data);
+      if (!formData.email) {
+        newErrors.email = 'Email обов’язковий'
+      } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+        newErrors.email = 'Невірний формат email'
       }
-    };
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setFormData({ 
-      ...formData, 
-      [e.target.name]: e.target.value 
-    });
-  };
+      if (!formData.password) {
+        newErrors.password = 'Пароль обов’язковий'
+      } else if (formData.password.length < 8) {
+        newErrors.password = 'Мінімум 8 символів'
+      }
+
+      if (mode === 'register' && !formData.username) {
+        newErrors.username = 'Ім’я обов’язкове'
+      }
+
+      setErrors(newErrors)
+      return Object.keys(newErrors).length === 0
+    }
+
+const handleSubmit = async (e: SyntheticEvent) => {
+    e.preventDefault()
+    setServerError(null)
+
+    if (!validateForm()) return
+
+    try {
+      let result: any
+      if (mode === 'login') {
+        result = await login({ 
+          login: formData.email, 
+          password: formData.password 
+        }).unwrap()
+      } else {
+        result = await register({
+          username: formData.username,
+          email: formData.email,
+          password: formData.password
+        }).unwrap()
+      }
+
+      const token = result?.accessToken || result?.token
+
+      if (token) {
+        dispatch(setCredentials({
+          user: result.user || { 
+            email: formData.email, 
+            username: result.username || formData.username 
+          },
+          token: token
+        }))
+        navigate('/')
+      }
+    } catch (err: any) {
+      setServerError(err.data?.message || 'Помилка доступу. Перевірте дані.')
+    }
+  }
+const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value })
+    if (errors[e.target.name]) {
+      setErrors({ ...errors, [e.target.name]: '' })
+    }
+  }
 
  return (
     <div className="relative min-h-screen bg-bg-main text-text-main flex items-center justify-center px-4 overflow-hidden">
@@ -139,6 +163,12 @@ const handleSubmit = async (e: SyntheticEvent) => {
             </button>
           </div>
 
+          {serverError && (
+            <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/50 text-red-500 text-xs font-medium flex items-center gap-2">
+              <div className="h-1.5 w-1.5 rounded-full bg-red-500" />
+              {serverError}
+            </div>)}
+
           <form
             className="space-y-4"
             onSubmit={handleSubmit}
@@ -155,8 +185,9 @@ const handleSubmit = async (e: SyntheticEvent) => {
                   onChange={handleChange}
                   required
                   placeholder="music_lover"
-                  className="w-full rounded-lg bg-bg-elevated border border-border-subtle px-3 py-2 text-sm text-text-main placeholder:text-text-muted/70 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                />
+                  className={`w-full rounded-lg bg-bg-elevated border px-3 py-2 text-sm text-text-main placeholder:text-text-muted/70 focus:outline-none focus:ring-2 focus:ring-primary ${
+                  errors.username ? 'border-red-500' : 'border-border-subtle' }`}/>
+                  {errors.username && <p className="text-[10px] text-red-500 ml-1">{errors.username}</p>}
               </div>
             )}
 
@@ -171,8 +202,10 @@ const handleSubmit = async (e: SyntheticEvent) => {
                 onChange={handleChange}
                 required
                 placeholder="you@example.com"
-                className="w-full rounded-lg bg-bg-elevated border border-border-subtle px-3 py-2 text-sm text-text-main placeholder:text-text-muted/70 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-              />
+                className={`w-full rounded-lg bg-bg-elevated border px-3 py-2 text-sm text-text-main placeholder:text-text-muted/70 focus:outline-none focus:ring-2 focus:ring-primary ${
+                errors.email ? 'border-red-500' : 'border-border-subtle'
+                }`}/>
+                {errors.email && <p className="text-[10px] text-red-500 ml-1">{errors.email}</p>}
             </div>
 
             <div className="space-y-1.5">
@@ -196,8 +229,10 @@ const handleSubmit = async (e: SyntheticEvent) => {
                 onChange={handleChange}
                 required
                 placeholder="••••••••"
-                className="w-full rounded-lg bg-bg-elevated border border-border-subtle px-3 py-2 text-sm text-text-main placeholder:text-text-muted/70 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-              />
+                className={`w-full rounded-lg bg-bg-elevated border px-3 py-2 text-sm text-text-main placeholder:text-text-muted/70 focus:outline-none focus:ring-2 focus:ring-primary ${
+                errors.password ? 'border-red-500' : 'border-border-subtle'
+                }`}/>
+              {errors.password && <p className="text-[10px] text-red-500 ml-1">{errors.password}</p>}
             </div>
 
             {mode === 'register' && (
