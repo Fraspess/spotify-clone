@@ -1,11 +1,11 @@
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
-import AuthPage from './pages/AuthPage';
+import AuthPage from './pages/authpage/AuthPage.tsx';
 import MainLayout from './layouts/MainLayout';
-import Home from './pages/Home'; 
-import SearchPage from './pages/SearchPage';
-import ProfilePage from './pages/ProfilePage';
-import AllAlbumsPage from './pages/AllAlbumsPage';
-import Oauth2GoogleCallback from "./components/Oauth2/Oauth2GoogleCallback.tsx";
+import Home from './pages/home/Home.tsx'; 
+import SearchPage from './pages/searchpage/SearchPage.tsx';
+import ProfilePage from './pages/profilepage/ProfilePage.tsx';
+import AllAlbumsPage from './pages/allalbumspage/AllAlbumsPage.tsx';
+import Oauth2GoogleCallback from "./components/oauth2/Oauth2GoogleCallback.tsx";
 
 function App() {
   return (

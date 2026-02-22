@@ -2,7 +2,7 @@ import { Search, User } from 'lucide-react'; // static icon pike ne merge pashu
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import type { RootState } from '../../services/store';
+import type { RootState } from '../../services/Api/store';
 
 const Topbar = () => {
   const navigate = useNavigate();

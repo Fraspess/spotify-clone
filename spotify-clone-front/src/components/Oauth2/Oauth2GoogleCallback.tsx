@@ -1,6 +1,6 @@
 import {useNavigate, useSearchParams} from "react-router-dom";
 import {useDispatch} from "react-redux";
-import {setCredentials} from "../../services/authSlice.tsx";
+import {setCredentials} from "../../services/Api/authSlice.tsx";
 import {useEffect} from "react";
 
 const Oauth2GoogleCallback = () => {
