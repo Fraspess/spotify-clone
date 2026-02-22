@@ -38,7 +38,23 @@ export const api = createApi({
         body: userData,
       }),
     }),
+
+  getSongs: builder.query<any[], { page: number; size: number }>({
+      query: ({ page = 0, size = 10 }) => ({
+        url: 'songs/getAll',
+        params: { page, size },
+      }),
+      transformResponse: (response: any) => response.data?.content || [],
+    }),
+
+    getAlbums: builder.query<any[], { page: number; size: number }>({
+      query: ({ page = 0, size = 10 }) => ({
+        url: 'albums/getAll',
+        params: { page, size },
+      }),
+      transformResponse: (response: any) => response.data?.content || [],
+    }),
   }),
 });
 
-export const { useLoginMutation, useRegisterMutation } = api;
+export const { useLoginMutation, useRegisterMutation, useGetSongsQuery, useGetAlbumsQuery } = api;

@@ -4,6 +4,7 @@ import MainLayout from './layouts/MainLayout';
 import Home from './pages/Home'; 
 import SearchPage from './pages/SearchPage';
 import ProfilePage from './pages/ProfilePage';
+import AllAlbumsPage from './pages/AllAlbumsPage';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           
           <Route path="profile" element={<ProfilePage />} />
 
+          <Route path="all-albums" element={<AllAlbumsPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

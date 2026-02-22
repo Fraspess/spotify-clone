@@ -27,11 +27,11 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/"+musicDir+"/**")
-                .addResourceLocations("file:"+musicDir+"/");
+                .addResourceLocations("file:"+musicDir);
         registry.addResourceHandler("/" + musicImagesDir+"/**")
                 .addResourceLocations("file:"+musicImagesDir);
         registry.addResourceHandler("/" + userImagesDir+"/**")
-                .addResourceLocations("file:"+userImagesDir);
+                .addResourceLocations("file:"+ userImagesDir);
     }
     @Override
     public void addCorsMappings(CorsRegistry registry) {
