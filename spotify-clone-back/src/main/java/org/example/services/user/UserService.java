@@ -8,20 +8,21 @@ import org.example.repositories.role.IRoleRepository;
 import org.example.repositories.song.ISongRepository;
 import org.example.repositories.user.IUserRepository;
 import org.example.services.jwt.JwtService;
+import org.example.services.smtp.SmtpService;
 import org.example.utils.AuthService;
 import org.example.utils.ImagesService;
+import org.example.utils.smtp.EmailMessage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +37,9 @@ public class UserService {
 
     @Value("${user.images.dir}")
     private String uploadImgDir;
+
+    @Value("${frontend.url}")
+    private String frontEndUrl;
 
     public Map<String, String> register(UserRegisterDTO dto) {
         if (userRepository.existsByEmail(dto.getEmail())) {
@@ -125,4 +129,54 @@ public class UserService {
 
     }
 
+
+    public void forgotPassword(String email){
+        var userOpt = userRepository.findByEmail(email);
+        if(userOpt.isEmpty()) return;
+        var user = userOpt.get();
+
+        String token = UUID.randomUUID().toString();
+        user.setResetPasswordToken(token);
+        userRepository.save(user);
+
+        String resetLink = frontEndUrl + "/users/reset-password?token=" + token;
+        String subject = "Відновлення паролю";
+        String body = """
+            <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 30px;">
+                <div style="max-width: 600px; margin: auto; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <div style="background: #007bff; color: white; padding: 15px; text-align: center;">
+                        <h2>Відновлення паролю</h2>
+                    </div>
+                    <div style="padding: 20px;">
+                        <p>Вітаємо, <strong>%s</strong>!</p>
+                        <p>Ми отримали запит на відновлення вашого паролю. Натисніть кнопку нижче, щоб задати новий пароль:</p>
+                        <div style="text-align: center; margin: 30px 0;">
+                            <a href="%s" style="background-color: #007bff; color: white; padding: 12px 25px; border-radius: 5px; text-decoration: none; font-size: 16px;">Скинути пароль</a>
+                        </div>
+                        <p>Або скопіюйте це посилання у браузер:</p>
+                        <p><a href="%s">%s</a></p>
+                        <p style="color: #888;">Якщо ви не надсилали запит, просто ігноруйте цей лист.</p>
+                    </div>
+                    <div style="background: #f0f0f0; color: #555; padding: 10px; text-align: center; font-size: 12px;">
+                        © %d Your Company. Усі права захищено.
+                    </div>
+                </div>
+            </div>
+            """.formatted(user.getUsername(), resetLink, resetLink, resetLink, Calendar.getInstance().get(Calendar.YEAR));
+
+        EmailMessage message = new EmailMessage();
+        message.setTo(email);
+        message.setSubject(subject);
+        message.setBody(body);
+
+        SmtpService smtpService = new SmtpService();
+        smtpService.sendEmail(message);
+    }
+
+    public void resetPassword(ResetPasswordDTO dto){
+        var token = dto.getToken();
+        var user = userRepository.findByResetPasswordToken(token).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"Токен не є валідним"));
+        user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        userRepository.save(user);
+    }
 }

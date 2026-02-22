@@ -36,6 +36,9 @@ public class SecurityConfig {
     @Value("${music.dir}")
     private String musicDir;
 
+    @Value("${frontend.url}")
+    private String frontEndUrl;
+
     private final AuthenticationProvider authenticationProvider;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final UserDetailsService userDetailsService;
@@ -60,7 +63,7 @@ public class SecurityConfig {
                             String accessToken = tokens.get("accessToken");
                             String refreshToken = tokens.get("refreshToken");
 
-                            response.sendRedirect("http://localhost:5173/oauth2/callback?accessToken=" + accessToken + "&refreshToken=" + refreshToken);
+                            response.sendRedirect(frontEndUrl + "/oauth2/callback?accessToken=" + accessToken + "&refreshToken=" + refreshToken);
                         }))
 
                         .authorizeHttpRequests(auth -> auth
@@ -87,7 +90,8 @@ public class SecurityConfig {
                                 .requestMatchers("/api/playlists/getAll").permitAll()
                                 .requestMatchers("/api/albums/getAll").permitAll()
                                 .requestMatchers("/api/albums/getById/**").permitAll()
-                                .requestMatchers("/api/users/googleAuth/**").permitAll()
+                                .requestMatchers("/api/users/reset-password").permitAll()
+                                .requestMatchers("/api/users/forgot-password").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/songs/create").permitAll()
 
 
