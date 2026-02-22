@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux';
 import { useLoginMutation, useRegisterMutation } from '../services/api';
 import { setCredentials } from '../services/authSlice';
 import { ArrowLeft } from "lucide-react";
+import {APP_ENV} from "../env";
 
 type Mode = 'login' | 'register'
 
@@ -78,7 +79,7 @@ const handleSubmit = async (e: SyntheticEvent) => {
         }).unwrap()
       }
 
-      const token = result?.accessToken || result?.token
+      const token = result?.accessToken || result?.token;
 
       if (token) {
         dispatch(setCredentials({
@@ -99,6 +100,11 @@ const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (errors[e.target.name]) {
       setErrors({ ...errors, [e.target.name]: '' })
     }
+  }
+
+
+  const handleLoginGoogle = () => {
+      window.location.href = APP_ENV.BACKEND_URL + "/oauth2/authorization/google"
   }
 
  return (
@@ -255,12 +261,26 @@ const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
               <div className="flex-1 h-px bg-border-subtle" />
             </div>
 
-            <button
-              type="button"
-              className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-bg-elevated hover:bg-bg-elevated-soft text-text-main font-medium text-sm py-2.5 border border-border-subtle transition-colors"
-            >
-              <span>Продовжити з Google</span>
-            </button>
+              <button
+                  onClick={(e) => {
+                      e.preventDefault();
+                      handleLoginGoogle();
+                  }}
+                  className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-700 font-medium hover:bg-gray-50 transition"
+              >
+                  {/* Іконка Google */}
+                  <svg
+                      className="w-5 h-5"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                  >
+                      <path
+                          d="M21.35 11.1h-9.18v2.92h5.26c-.23 1.23-1.09 3.6-5.26 3.6-3.16 0-5.75-2.6-5.75-5.8s2.59-5.8 5.75-5.8c1.8 0 3.0.78 3.72 1.46l2.54-2.48C18.03 3.05 15.94 2 12.17 2 6.64 2 2 6.64 2 12s4.64 10 10.17 10c5.86 0 9.72-4.12 9.72-9.88 0-.66-.07-1.15-.54-1.92z"
+                          fill="#4285F4"
+                      />
+                  </svg>
+                  Вхід через Google
+              </button>
           </form>
         </div>
       </div>
