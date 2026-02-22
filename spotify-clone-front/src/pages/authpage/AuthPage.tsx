@@ -2,10 +2,10 @@ import { useState, useEffect,  } from 'react'
 import type { SyntheticEvent, ChangeEvent } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useDispatch } from 'react-redux';
-import { useLoginMutation, useRegisterMutation } from '../services/api';
-import { setCredentials } from '../services/authSlice';
+import { useLoginMutation, useRegisterMutation } from '../../services/Api/api';
+import { setCredentials } from '../../services/Api/authSlice';
 import { ArrowLeft } from "lucide-react";
-import {APP_ENV} from "../env";
+import {APP_ENV} from "../../env";
 
 type Mode = 'login' | 'register'
 

@@ -1,4 +1,4 @@
-import { useGetAlbumsQuery } from '../services/api';
+import { useGetAlbumsQuery } from '../../services/Api/api';
 import { useNavigate } from 'react-router-dom';
 import { Disc, Play, ArrowLeft } from 'lucide-react';
 

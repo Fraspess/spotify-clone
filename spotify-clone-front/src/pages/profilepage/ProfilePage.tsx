@@ -1,7 +1,7 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { logout } from '../services/authSlice';
-import type { RootState } from '../services/store';
+import { logout } from '../../services/Api/authSlice';
+import type { RootState } from '../../services/Api/store';
 import { LogOut, User as UserIcon, Mail, ShieldCheck } from 'lucide-react';
 
 const ProfilePage = () => {

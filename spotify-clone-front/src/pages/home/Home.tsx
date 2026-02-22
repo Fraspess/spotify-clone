@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useGetSongsQuery, useGetAlbumsQuery } from '../services/api';
+import { useGetSongsQuery, useGetAlbumsQuery } from '../../services/Api/api';
 import { Play, Disc, Music, Plus } from 'lucide-react';
 
 const Home = () => {
