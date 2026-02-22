@@ -85,4 +85,10 @@ public class SongController {
         return ResponseEntity.ok(
                 new ServerResponse<>(true,"Пісню додано до улюблених", null));
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<ServerResponse<?>> search(@RequestParam String q){
+        var songs = songService.search(q);
+        return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse<>(true, "", songs));
+    }
 }

@@ -1,9 +1,7 @@
 package org.example.entities.song;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.example.entities.album.AlbumEntity;
 import org.example.entities.playlist.PlaylistEntity;
 import org.example.entities.user.UserEntity;
@@ -15,7 +13,8 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Data
+@Setter
+@Getter
 @Table(name = "songs")
 @AllArgsConstructor
 @NoArgsConstructor
