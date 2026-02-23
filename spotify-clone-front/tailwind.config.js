@@ -4,23 +4,23 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Основна тема: червоний + чорний
-        primary: '#E50914', // яскравий червоний
-        'primary-dark': '#B20710',
-        'primary-soft': '#FF3344',
+        // Spotify Primary Green
+        primary: '#1DB954',
+        'primary-dark': '#1AA34A',
+        'primary-soft': '#1ED760',
 
-        // Фони
-        'bg-main': '#000000',
-        'bg-elevated': '#121212',
-        'bg-elevated-soft': '#181818',
+        // Backgrounds (Spotify dark theme)
+        'bg-main': '#121212',
+        'bg-elevated': '#181818',
+        'bg-elevated-soft': '#202020',
 
-        // Текст
+        // Text
         'text-main': '#FFFFFF',
         'text-muted': '#B3B3B3',
 
-        // Акценти / межі
+        // Borders / accents
         'border-subtle': '#282828',
-        'accent-danger': '#FF4B5C'
+        'accent-danger': '#E91429'
       },
       fontFamily: {
         sans: ['system-ui', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif']
@@ -35,5 +35,3 @@ export default {
   },
   plugins: []
 }
-
-
