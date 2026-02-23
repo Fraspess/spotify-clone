@@ -1,28 +1,26 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 interface AuthState {
-  token: string | null;
+  accessToken: string | null;
+  refreshToken: string | null;
   user: any | null;
 }
 
-const getInitialToken = () => {
-  const token = localStorage.getItem('token');
-  if (!token || token === 'null' || token === 'undefined' || token.includes('object')) return null;
-  return token;
-};
-
-const getInitialUser = () => {
-  const user = localStorage.getItem('user');
-  try {
-    return user ? JSON.parse(user) : null;
-  } catch {
-    return null;
-  }
+const getStorageItem = (key: string) => {
+  const item = localStorage.getItem(key);
+  if (!item || item === 'null' || item === 'undefined' || item.includes('object')) return null;
+  return item;
 };
 
 const initialState: AuthState = {
-  token: getInitialToken(),
-  user: getInitialUser(),
+  accessToken: getStorageItem('accessToken'),
+  refreshToken: getStorageItem('refreshToken'),
+  user: (() => {
+    try {
+      const user = localStorage.getItem('user');
+      return user ? JSON.parse(user) : null;
+    } catch { return null; }
+  })(),
 };
 
 const authSlice = createSlice({
@@ -31,28 +29,23 @@ const authSlice = createSlice({
   reducers: {
     setCredentials: (
       state,
-      { payload }: PayloadAction<{ token: string | any; user?: any }>
+      { payload }: PayloadAction<{ accessToken: string; refreshToken?: string; user?: any }>
     ) => {
-      const tokenString = typeof payload.token === 'object' 
-        ? payload.token.accessToken || payload.token.token 
-        : payload.token;
+      state.accessToken = payload.accessToken;
+      if (payload.refreshToken) state.refreshToken = payload.refreshToken;
+      if (payload.user) state.user = payload.user;
 
-      if (tokenString) {
-        state.token = tokenString;
-        state.user = payload.user || null;
-        
-        localStorage.setItem('token', tokenString);
-        if (payload.user) {
-          localStorage.setItem('user', JSON.stringify(payload.user));
-        }
-      }
+      localStorage.setItem('accessToken', payload.accessToken);
+      if (payload.refreshToken) localStorage.setItem('refreshToken', payload.refreshToken);
+      if (payload.user) localStorage.setItem('user', JSON.stringify(payload.user));
     },
     logout: (state) => {
-      state.token = null;
+      state.accessToken = null;
+      state.refreshToken = null;
       state.user = null;
-      localStorage.removeItem('token');
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
       localStorage.removeItem('user');
-      localStorage.removeItem('auth');
     },
   },
 });
