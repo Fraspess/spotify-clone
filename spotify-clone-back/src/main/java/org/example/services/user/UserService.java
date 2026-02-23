@@ -111,7 +111,7 @@ public class UserService {
     }
 
 
-    public Map<String,String> googleAuth(String email){
+    public Map<String,String> googleAuth(String email, String imageUrl){
         var userOpt = userRepository.findByEmail(email);
         if(userOpt.isEmpty()){
             var newUser = new UserEntity();
@@ -121,6 +121,7 @@ public class UserService {
             var userRole = roleRepository.findByName("USER").orElseThrow(() -> new IllegalArgumentException("Немає ролі юзер????"));
             newUser.getRoles().add(userRole);
             userRepository.save(newUser);
+            userImagesService.load(imageUrl, uploadImgDir);
             return jwtService.generateRefreshAccessTokens(newUser);
         }else{
             var user = userOpt.get();
