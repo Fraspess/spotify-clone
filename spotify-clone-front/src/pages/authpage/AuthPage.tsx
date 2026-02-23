@@ -59,42 +59,31 @@ function AuthPage() {
     }
 
 const handleSubmit = async (e: SyntheticEvent) => {
-    e.preventDefault()
-    setServerError(null)
+  e.preventDefault();
+  setServerError(null);
 
-    if (!validateForm()) return
+  if (!validateForm()) return;
 
-    try {
-      let result: any
-      if (mode === 'login') {
-        result = await login({ 
-          login: formData.email, 
-          password: formData.password 
-        }).unwrap()
-      } else {
-        result = await register({
-          username: formData.username,
-          email: formData.email,
-          password: formData.password
-        }).unwrap()
-      }
-
-      const token = result?.accessToken || result?.token;
-
-      if (token) {
-        dispatch(setCredentials({
-          user: result.user || { 
-            email: formData.email, 
-            username: result.username || formData.username 
-          },
-          token: token
-        }))
-        navigate('/')
-      }
-    } catch (err: any) {
-      setServerError(err.data?.message || 'Помилка доступу. Перевірте дані.')
+  try {
+    if (mode === 'login') {
+      await login({ 
+        login: formData.email, 
+        password: formData.password 
+      }).unwrap();
+    } else {
+      await register({
+        username: formData.username,
+        email: formData.email,
+        password: formData.password
+      }).unwrap();
     }
+
+    navigate('/');
+    
+  } catch (err: any) {
+    setServerError(err.data?.message || 'Помилка доступу. Перевірте дані.');
   }
+};
 const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
     if (errors[e.target.name]) {

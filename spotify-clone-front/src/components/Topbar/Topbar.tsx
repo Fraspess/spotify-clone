@@ -9,7 +9,7 @@ const Topbar = () => {
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { token, user } = useSelector((state: RootState) => state.auth);
+  const { accessToken, user } = useSelector((state: RootState) => state.auth);
 
   return (
     <header className="flex items-center gap-x-4 px-6 py-3 bg-black/20 backdrop-blur-md sticky top-0 z-50">
@@ -50,7 +50,7 @@ const Topbar = () => {
       </div>
 
       <div className="flex items-center gap-4 ml-auto">
-        {token ? (
+        {accessToken ? (
           <button 
             onClick={() => navigate('/profile')}
             className="flex items-center gap-2 bg-bg-elevated hover:bg-bg-elevated-soft px-3 py-1.5 rounded-full transition border border-white/5 active:scale-95"
