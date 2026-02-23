@@ -101,7 +101,6 @@ const Home = () => {
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-2xl font-extrabold tracking-tight">Рекомендовані треки</h2>
           <div className="h-[1px] flex-1 mx-6 bg-white/5 hidden md:block"></div>
-          <span className="text-xs font-mono text-text-muted">Total: {songs.length}</span>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-3">
