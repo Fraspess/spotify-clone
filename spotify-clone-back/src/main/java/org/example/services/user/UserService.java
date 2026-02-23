@@ -1,9 +1,12 @@
 package org.example.services.user;
 
 import lombok.RequiredArgsConstructor;
+import org.example.dtos.pendingUser.PendingUserDTO;
 import org.example.dtos.user.*;
 import org.example.entities.user.UserEntity;
+import org.example.mappers.pendingUser.PendingUserMapper;
 import org.example.mappers.user.UserMapper;
+import org.example.repositories.pendingUser.IPendingUserRepository;
 import org.example.repositories.role.IRoleRepository;
 import org.example.repositories.song.ISongRepository;
 import org.example.repositories.user.IUserRepository;
@@ -19,6 +22,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -34,6 +38,8 @@ public class UserService {
     private final IRoleRepository roleRepository;
     private final ImagesService userImagesService;
     private final AuthService authService;
+    private final PendingUserMapper pendingUserMapper;
+    private final IPendingUserRepository pendingUserRepository;
 
     @Value("${user.images.dir}")
     private String uploadImgDir;
@@ -41,18 +47,58 @@ public class UserService {
     @Value("${frontend.url}")
     private String frontEndUrl;
 
-    public Map<String, String> register(UserRegisterDTO dto) {
-        if (userRepository.existsByEmail(dto.getEmail())) {
+    public void registerRequest(PendingUserDTO dto) {
+        if (userRepository.existsByEmail(dto.getEmail()) || pendingUserRepository.existsByEmail(dto.getEmail())) {
             throw new IllegalArgumentException("Почта занята");
         }
-        if (userRepository.existsByUsername(dto.getUsername())) {
+        if (userRepository.existsByUsername(dto.getUsername()) || pendingUserRepository.existsByUsername(dto.getUsername())) {
             throw new IllegalArgumentException("Юзернейм вже зайнятий");
         }
-        var user = userMapper.fromRegisterDTO(dto);
-        user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        var pendingUser = pendingUserMapper.fromDTO(dto);
+        pendingUser.setPassword(passwordEncoder.encode(dto.getPassword()));
+        Random random = new Random();
+        int min = 100000;
+        int max = 999999;
+        pendingUser.setConfirmCode(random.nextLong(min, max + 1));
 
-        var role = roleRepository.findByName("USER").orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Нема ролі юзер????"));
-        user.getRoles().add(role);
+        String subject = "Підтвердження реєстрації";
+
+        String body = """
+                <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 30px;">
+                    <div style="max-width: 600px; margin: auto; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <div style="background: #007bff; color: white; padding: 15px; text-align: center;">
+                            <h2>Підтвердження реєстрації</h2>
+                        </div>
+                        <div style="padding: 20px;">
+                            <p>Вітаємо, <strong>%s</strong>!</p>
+                            <p>Ми отримали запит реєстрації на цю почту. Нижче код який треба ввести щоб підтвердити реєстрацію</p>
+                            <div style="text-align: center; margin: 30px 0;">
+                                <h4 style="font-weight:bold;">Ваш код: %s</h4>
+                            </div>
+                            <p style="color: #888;">Якщо ви не надсилали запит, просто ігноруйте цей лист.</p>
+                        </div>
+                        <div style="background: #f0f0f0; color: #555; padding: 10px; text-align: center; font-size: 12px;">
+                            © %d Your Company. Усі права захищено.
+                        </div>
+                    </div>
+                </div>
+                """.formatted(pendingUser.getUsername(), pendingUser.getConfirmCode(), Calendar.getInstance().get(Calendar.YEAR));
+
+        EmailMessage message = new EmailMessage();
+        message.setBody(body);
+        message.setTo(pendingUser.getEmail());
+        message.setSubject(subject);
+
+        SmtpService smtpService = new SmtpService();
+        smtpService.sendEmail(message);
+        pendingUserRepository.save(pendingUser);
+
+    }
+
+    public Map<String, String> register(Long confirmCode) {
+        var pendingUser = pendingUserRepository.findByConfirmCode(confirmCode).orElseThrow(() -> new IllegalArgumentException("Невірний код"));
+        var user = userMapper.fromPendingUser(pendingUser);
+        pendingUserRepository.delete(pendingUser);
         userRepository.save(user);
         return jwtService.generateRefreshAccessTokens(user);
     }
@@ -102,7 +148,7 @@ public class UserService {
         return userMapper.fromEntity(userOpt.orElseThrow(() -> new IllegalArgumentException("Юзера не знайдено")));
     }
 
-    public UserResponseDTO getById(Long id){
+    public UserResponseDTO getById(Long id) {
         return userMapper.fromEntity(userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Юзера не знайдено")));
     }
 
@@ -111,9 +157,9 @@ public class UserService {
     }
 
 
-    public Map<String,String> googleAuth(String email, String imageUrl){
+    public Map<String, String> googleAuth(String email, String imageUrl) {
         var userOpt = userRepository.findByEmail(email);
-        if(userOpt.isEmpty()){
+        if (userOpt.isEmpty()) {
             var newUser = new UserEntity();
             newUser.setEmail(email);
             newUser.setUsername(email.split("@")[0]);
@@ -123,7 +169,7 @@ public class UserService {
             userRepository.save(newUser);
             userImagesService.load(imageUrl, uploadImgDir);
             return jwtService.generateRefreshAccessTokens(newUser);
-        }else{
+        } else {
             var user = userOpt.get();
             return jwtService.generateRefreshAccessTokens(user);
         }
@@ -131,9 +177,9 @@ public class UserService {
     }
 
 
-    public void forgotPassword(String email){
+    public void forgotPassword(String email) {
         var userOpt = userRepository.findByEmail(email);
-        if(userOpt.isEmpty()) return;
+        if (userOpt.isEmpty()) return;
         var user = userOpt.get();
 
         String token = UUID.randomUUID().toString();
@@ -143,27 +189,27 @@ public class UserService {
         String resetLink = frontEndUrl + "/users/reset-password?token=" + token;
         String subject = "Відновлення паролю";
         String body = """
-            <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 30px;">
-                <div style="max-width: 600px; margin: auto; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    <div style="background: #007bff; color: white; padding: 15px; text-align: center;">
-                        <h2>Відновлення паролю</h2>
-                    </div>
-                    <div style="padding: 20px;">
-                        <p>Вітаємо, <strong>%s</strong>!</p>
-                        <p>Ми отримали запит на відновлення вашого паролю. Натисніть кнопку нижче, щоб задати новий пароль:</p>
-                        <div style="text-align: center; margin: 30px 0;">
-                            <a href="%s" style="background-color: #007bff; color: white; padding: 12px 25px; border-radius: 5px; text-decoration: none; font-size: 16px;">Скинути пароль</a>
+                <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 30px;">
+                    <div style="max-width: 600px; margin: auto; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <div style="background: #007bff; color: white; padding: 15px; text-align: center;">
+                            <h2>Відновлення паролю</h2>
                         </div>
-                        <p>Або скопіюйте це посилання у браузер:</p>
-                        <p><a href="%s">%s</a></p>
-                        <p style="color: #888;">Якщо ви не надсилали запит, просто ігноруйте цей лист.</p>
-                    </div>
-                    <div style="background: #f0f0f0; color: #555; padding: 10px; text-align: center; font-size: 12px;">
-                        © %d Your Company. Усі права захищено.
+                        <div style="padding: 20px;">
+                            <p>Вітаємо, <strong>%s</strong>!</p>
+                            <p>Ми отримали запит на відновлення вашого паролю. Натисніть кнопку нижче, щоб задати новий пароль:</p>
+                            <div style="text-align: center; margin: 30px 0;">
+                                <a href="%s" style="background-color: #007bff; color: white; padding: 12px 25px; border-radius: 5px; text-decoration: none; font-size: 16px;">Скинути пароль</a>
+                            </div>
+                            <p>Або скопіюйте це посилання у браузер:</p>
+                            <p><a href="%s">%s</a></p>
+                            <p style="color: #888;">Якщо ви не надсилали запит, просто ігноруйте цей лист.</p>
+                        </div>
+                        <div style="background: #f0f0f0; color: #555; padding: 10px; text-align: center; font-size: 12px;">
+                            © %d Your Company. Усі права захищено.
+                        </div>
                     </div>
                 </div>
-            </div>
-            """.formatted(user.getUsername(), resetLink, resetLink, resetLink, Calendar.getInstance().get(Calendar.YEAR));
+                """.formatted(user.getUsername(), resetLink, resetLink, resetLink, Calendar.getInstance().get(Calendar.YEAR));
 
         EmailMessage message = new EmailMessage();
         message.setTo(email);
@@ -174,10 +220,15 @@ public class UserService {
         smtpService.sendEmail(message);
     }
 
-    public void resetPassword(ResetPasswordDTO dto){
+    public void resetPassword(ResetPasswordDTO dto) {
         var token = dto.getToken();
-        var user = userRepository.findByResetPasswordToken(token).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"Токен не є валідним"));
+        var user = userRepository.findByResetPasswordToken(token).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Токен не є валідним"));
         user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
         userRepository.save(user);
+    }
+
+    public UserResponseDTO me(){
+        var user = authService.getUser();
+        return userMapper.fromEntity(user);
     }
 }

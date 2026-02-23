@@ -3,6 +3,8 @@ package org.example.controllers.user;
 import lombok.RequiredArgsConstructor;
 import org.apache.catalina.Server;
 import org.apache.catalina.User;
+import org.example.dtos.pendingUser.ConfirmRegisterDTO;
+import org.example.dtos.pendingUser.PendingUserDTO;
 import org.example.dtos.song.FavoriteSongDTO;
 import org.example.dtos.token.TokenDTO;
 import org.example.dtos.user.*;
@@ -32,13 +34,22 @@ public class UserController {
 
     private final UserService userService;
 
+    @PostMapping("/register-request")
+    public ResponseEntity<ServerResponse<?>> registerRequest(@RequestBody PendingUserDTO dto) {
+        userService.registerRequest(dto);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(new ServerResponse<>(true,"На почту був відправлений код для активації аккаунту",null));
+    }
+
     @PostMapping("/register")
-    public ResponseEntity<ServerResponse<?>> register(@RequestBody UserRegisterDTO dto) {
-        var token = userService.register(dto);
+    public ResponseEntity<ServerResponse<?>> registerRequest(@RequestBody ConfirmRegisterDTO dto) {
+        var token = userService.register(dto.getConfirmCode());
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(new ServerResponse<>(true,"Реєстрація успішна", token));
     }
+
 
 
     @PostMapping("/login")
@@ -48,6 +59,12 @@ public class UserController {
                 new ServerResponse<>(true,"Успішний вхід в систему", token)
         );
 
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<ServerResponse<?>> me(){
+        return ResponseEntity.status(HttpStatus.OK).
+                body(new ServerResponse<>(true,null,userService.me()));
     }
 
     @PutMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

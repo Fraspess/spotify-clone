@@ -69,6 +69,7 @@ public class SecurityConfig {
                         .authorizeHttpRequests(auth -> auth
                                 .requestMatchers("/").permitAll()
                                 .requestMatchers("/api/users/**").permitAll()
+                                .requestMatchers("/api/users/register-request").permitAll()
                                 .requestMatchers("/" + musicImagesDir + "/**").permitAll()
                                 .requestMatchers("/" + userImagesDir + "/**").permitAll()
                                 .requestMatchers("/" + musicDir + "/**").permitAll()
