@@ -39,7 +39,8 @@ public class JwtService {
                 .claim("type", "access")
                 .setIssuer(jwtIssuer)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 15 * 60 * 1000))
+//                .setExpiration(new Date(System.currentTimeMillis() + 15 * 60 * 1000))
+                .setExpiration(new Date(System.currentTimeMillis() + 60 * 1000))
                 .signWith(getAccessKey(), SignatureAlgorithm.HS256)
                 .compact();
     }

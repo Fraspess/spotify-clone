@@ -32,7 +32,7 @@ interface UserResponse {
 const baseQuery = fetchBaseQuery({
     baseUrl: APP_ENV.BACKEND_URL + '/api',
     prepareHeaders: (headers, { getState }) => {
-        const token = (getState() as RootState).auth.accessToken;
+        const token = localStorage.getItem('accessToken');
         if (token) {
             headers.set('authorization', `Bearer ${token}`);
         }
@@ -50,17 +50,17 @@ const baseQueryWithReauth = async (args: any, api: any, extraOptions: any) => {
                 {
                     url: 'users/refresh',
                     method: 'POST',
-                    body: { refreshToken: (api.getState() as RootState).auth.refreshToken },
+                    body: { token: localStorage.getItem("refreshToken") },
                 },
                 api,
                 extraOptions
             );
-
+            console.log(refreshResult);
             if (refreshResult.data) {
-                api.dispatch(setCredentials({
-                    accessToken: refreshResult.data.accessToken,
-                    refreshToken: refreshResult.data.refreshToken,
-                    user: refreshResult.data.user || null,
+                console.log(refreshResult.data);
+                await api.dispatch(setCredentials({
+                    accessToken: refreshResult.data.data.accessToken,
+                    refreshToken: refreshResult.data.data.refreshToken,
                 }));
 
                 result = await baseQuery(args, api, extraOptions);
