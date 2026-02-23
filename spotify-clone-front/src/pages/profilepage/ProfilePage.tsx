@@ -1,6 +1,7 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../../services/Api/authSlice';
+import { useGetUserByUsernameQuery } from '../../services/Api/api';
 import type { RootState } from '../../services/Api/store';
 import { LogOut, User as UserIcon, Mail, ShieldCheck } from 'lucide-react';
 import {useGetMeQuery} from "../../services/Api/api.tsx";
@@ -11,11 +12,12 @@ const ProfilePage = () => {
   const navigate = useNavigate();
 
   const { data: userData, isLoading } = useGetMeQuery();
+
   const handleLogout = () => {
     dispatch(logout());
     navigate('/');
   };
-  console.log(userData);
+  
   return (
     <div className="max-w-4xl mx-auto mt-8">
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary/20 to-primary-soft/10 p-8 border border-white/5 mb-8">
@@ -24,16 +26,19 @@ const ProfilePage = () => {
             <UserIcon size={64} />
           </div>
 
-          {isLoading && <div> Loading ...</div>}
+          {isLoading && <div> Загрузка профілю...</div>}
           
           <div className="text-center md:text-left">
             <h1 className="text-4xl font-black tracking-tight text-white mb-2">
               {userData?.username}
+
             </h1>
             <div className="flex flex-wrap justify-center md:justify-start gap-4 text-text-muted">
               <div className="flex items-center gap-2">
                 <Mail size={16} className="text-primary" />
                 <span className="text-sm">{userData?.email}</span>
+
+
               </div>
               <div className="flex items-center gap-2">
                 <ShieldCheck size={16} className="text-primary" />
