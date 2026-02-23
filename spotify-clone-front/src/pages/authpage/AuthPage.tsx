@@ -38,10 +38,10 @@ function AuthPage() {
     const newErrors: { [key: string]: string } = {}
 
     if (!formData.email) {
-      newErrors.email = 'Email обов’язковий'
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Невірний формат email'
-    }
+        newErrors.email = 'Поле обов’язкове'
+      } else if (mode === 'register' && !/\S+@\S+\.\S+/.test(formData.email)) {
+        newErrors.email = 'Невірний формат email'
+      }
 
     if (!formData.password) {
       newErrors.password = 'Пароль обов’язковий'
@@ -90,7 +90,7 @@ function AuthPage() {
           refreshToken: responseData.refreshToken,
           user: {
             username: responseData.username || formData.username || formData.email.split('@')[0],
-            email: formData.email
+            email: formData.email.includes('@') ? formData.email : null
           }
         }));
       }
@@ -190,14 +190,14 @@ function AuthPage() {
             )}
 
             <div className="space-y-1.5">
-              <label className="block text-sm font-medium text-text-main">Email</label>
+              <label className="block text-sm font-medium text-text-main">Email або Login</label>
               <input
-                type="email"
+                type="text"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
                 required
-                placeholder="you@example.com"
+                placeholder={mode === 'login' ? "Логін або email" : "you@example.com"}
                 className={`w-full rounded-lg bg-bg-elevated border px-3 py-2 text-sm text-text-main placeholder:text-text-muted/70 focus:outline-none focus:ring-2 focus:ring-primary ${errors.email ? 'border-red-500' : 'border-border-subtle'}`} />
               {errors.email && <p className="text-[10px] text-red-500 ml-1">{errors.email}</p>}
             </div>
