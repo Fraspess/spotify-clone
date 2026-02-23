@@ -15,6 +15,7 @@ public class UserResponseDTO {
     private Long id;
     private String username;
     private String image;
+    private String email;
 
     private Set<SongShortDTO> songs = new HashSet<>();
     private Set<SongShortDTO> favoriteSongs = new HashSet<>();

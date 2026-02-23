@@ -3,6 +3,7 @@ package org.example.mappers.user;
 import org.example.dtos.user.GetAllUsersDTO;
 import org.example.dtos.user.UserRegisterDTO;
 import org.example.dtos.user.UserResponseDTO;
+import org.example.entities.pendingUser.PendingUserEntity;
 import org.example.entities.user.UserEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -22,5 +23,7 @@ public interface UserMapper {
     List<GetAllUsersDTO> fromEntityGetAll(List<UserEntity> users);
 
     UserResponseDTO fromEntity(UserEntity user);
+
+    UserEntity fromPendingUser(PendingUserEntity pendingUser);
 
 }

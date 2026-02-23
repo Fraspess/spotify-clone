@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import java.net.URI;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,6 +38,18 @@ public class ImagesService {
             return "";
         }
     }
+
+    public String load(String imageUrl, String uploadDir) {
+        if (!imageUrl.startsWith("http://") && !imageUrl.startsWith("https://")) return "";
+
+        try (var inputStream = new URL(imageUrl).openStream()) {
+            return saveStreamToFile(inputStream, uploadDir);
+        } catch (IOException e) {
+            System.out.println("Problem saving image:" + e);
+            return "";
+        }
+    }
+
 
     public void remove(String fileName, String uploadDir) {
         try {

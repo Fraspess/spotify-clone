@@ -4,29 +4,20 @@ import { logout } from '../../services/Api/authSlice';
 import { useGetUserByUsernameQuery } from '../../services/Api/api';
 import type { RootState } from '../../services/Api/store';
 import { LogOut, User as UserIcon, Mail, ShieldCheck } from 'lucide-react';
+import {useGetMeQuery} from "../../services/Api/api.tsx";
+import {useEffect, useState} from "react";
 
 const ProfilePage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { user: reduxUser } = useSelector((state: RootState) => state.auth);
-
-  const { data: profileResponse, isLoading } = useGetUserByUsernameQuery(
-    reduxUser?.username || '', 
-    { skip: !reduxUser?.username }
-  );
-
-  const user = profileResponse?.data || reduxUser;
+  const { data: userData, isLoading } = useGetMeQuery();
 
   const handleLogout = () => {
     dispatch(logout());
     navigate('/');
   };
-
-  if (isLoading && !user?.username) {
-    return <div className="flex justify-center mt-20 text-white">Завантаження профілю...</div>;
-  }
-
+  
   return (
     <div className="max-w-4xl mx-auto mt-8">
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary/20 to-primary-soft/10 p-8 border border-white/5 mb-8">
@@ -34,18 +25,20 @@ const ProfilePage = () => {
           <div className="h-32 w-32 rounded-full bg-primary flex items-center justify-center text-bg-main shadow-2xl ring-4 ring-white/10">
             <UserIcon size={64} />
           </div>
+
+          {isLoading && <div> Загрузка профілю...</div>}
           
           <div className="text-center md:text-left">
             <h1 className="text-4xl font-black tracking-tight text-white mb-2">
-              {/* Тепер тут завжди буде ім'я */}
-              {user?.username || "Користувач"}
+              {userData?.username}
+
             </h1>
             <div className="flex flex-wrap justify-center md:justify-start gap-4 text-text-muted">
               <div className="flex items-center gap-2">
                 <Mail size={16} className="text-primary" />
-                <span className="text-sm">
-                  {user?.email || (isLoading ? "Завантаження..." : "Email не вказано")}
-                </span>
+                <span className="text-sm">{userData?.email}</span>
+
+
               </div>
               <div className="flex items-center gap-2">
                 <ShieldCheck size={16} className="text-primary" />

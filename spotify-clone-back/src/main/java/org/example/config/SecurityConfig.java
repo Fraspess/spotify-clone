@@ -57,8 +57,8 @@ public class SecurityConfig {
                         .successHandler((request, response, authentication) -> {
                             OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
                             String email = oAuth2User.getAttribute("email");
-
-                            Map<String, String> tokens = userService.googleAuth(email);
+                            String image = oAuth2User.getAttribute("picture");
+                            Map<String, String> tokens = userService.googleAuth(email, image);
 
                             String accessToken = tokens.get("accessToken");
                             String refreshToken = tokens.get("refreshToken");
@@ -69,6 +69,7 @@ public class SecurityConfig {
                         .authorizeHttpRequests(auth -> auth
                                 .requestMatchers("/").permitAll()
                                 .requestMatchers("/api/users/**").permitAll()
+                                .requestMatchers("/api/users/register-request").permitAll()
                                 .requestMatchers("/" + musicImagesDir + "/**").permitAll()
                                 .requestMatchers("/" + userImagesDir + "/**").permitAll()
                                 .requestMatchers("/" + musicDir + "/**").permitAll()

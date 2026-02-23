@@ -6,13 +6,14 @@ import SearchPage from './pages/searchpage/SearchPage.tsx';
 import ProfilePage from './pages/profilepage/ProfilePage.tsx';
 import AllAlbumsPage from './pages/allalbumspage/AllAlbumsPage.tsx';
 import Oauth2GoogleCallback from "./components/oauth2/Oauth2GoogleCallback.tsx";
+import ConfirmRegisterPage from "./pages/confirmRegisterPage/ConfirmRegisterPage.tsx";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<AuthPage />} />
-
+        <Route path="/confirm-register" element={<ConfirmRegisterPage/>} />
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Home />} />
           <Route path="search" element={<SearchPage />} /> 
@@ -22,6 +23,7 @@ function App() {
           <Route path="all-albums" element={<AllAlbumsPage />} />
 
           <Route path="/oauth2/callback" element={<Oauth2GoogleCallback/>}/>
+
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import type { SyntheticEvent, ChangeEvent } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useDispatch } from 'react-redux';
-import { useLoginMutation, useRegisterMutation } from '../../services/Api/api';
+import {useLoginMutation, useRegisterMutation, useRegisterRequestMutation} from '../../services/Api/api';
 import { setCredentials } from '../../services/Api/authSlice';
 import { ArrowLeft } from "lucide-react";
 import { APP_ENV } from "../../env";
@@ -14,11 +14,11 @@ function AuthPage() {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const [login, { isLoading: isLoginLoading }] = useLoginMutation()
-  const [register, { isLoading: isRegisterLoading }] = useRegisterMutation()
   const modeFromUrl = searchParams.get('mode') as Mode
   const [mode, setMode] = useState<Mode>(modeFromUrl || 'login')
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [serverError, setServerError] = useState<string | null>(null)
+  const [registerRequest, {isLoading: isRegisterRequestLoading}] = useRegisterRequestMutation();
 
   const [formData, setFormData] = useState({
     username: '',
@@ -71,11 +71,14 @@ function AuthPage() {
           password: formData.password
         }).unwrap();
       } else {
-        result = await register({
+        result = await registerRequest({
           username: formData.username,
           email: formData.email,
-          password: formData.password
+          password: formData.password,
         }).unwrap();
+        navigate("/confirm-register");
+        sessionStorage.setItem("registerConfirmEmail", formData.email)
+        return;
       }
 
       if (result && result.data) {
@@ -222,10 +225,10 @@ function AuthPage() {
 
             <button
               type="submit"
-              disabled={isLoginLoading || isRegisterLoading}
+              disabled={isLoginLoading || isRegisterRequestLoading }
               className="mt-2 w-full inline-flex items-center justify-center gap-2 rounded-xl bg-primary hover:bg-primary-soft text-bg-main font-semibold text-sm py-2.5 transition-colors shadow-md disabled:opacity-50"
             >
-              {isLoginLoading || isRegisterLoading ? 'Завантаження...' : mode === 'login' ? 'Увійти' : 'Створити акаунт'}
+              {isLoginLoading || isRegisterRequestLoading ? 'Завантаження...' : mode === 'login' ? 'Увійти' : 'Створити акаунт'}
             </button>
 
             <div className="flex items-center my-4">
