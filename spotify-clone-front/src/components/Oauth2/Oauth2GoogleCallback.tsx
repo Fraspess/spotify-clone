@@ -1,7 +1,13 @@
+import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import { jwtDecode } from "jwt-decode";
 import { setCredentials } from "../../services/Api/authSlice.tsx";
-import { useEffect } from "react";
+
+interface GoogleJwtPayload {
+    username: string;
+    email: string;
+}
 
 const Oauth2GoogleCallback = () => {
     const navigate = useNavigate();
@@ -13,22 +19,46 @@ const Oauth2GoogleCallback = () => {
         const refreshToken = searchParams.get("refreshToken");
 
         if (accessToken && refreshToken) {
-            dispatch(setCredentials({ 
-                accessToken, 
-                refreshToken,
-                user: null 
-            }));
+            try {
+                const decoded = jwtDecode<GoogleJwtPayload>(accessToken);
 
-            navigate("/", { replace: true });
+                dispatch(setCredentials({ 
+                    accessToken, 
+                    refreshToken,
+                    user: { 
+                        username: decoded.username, 
+                        email: decoded.email 
+                    } 
+                }));
+                navigate("/", { replace: true });
+            } catch (error) {
+                console.error("JWT Decode Error:", error);
+                navigate("/login");
+            }
         } else {
-            console.error("Auth failed: Tokens not found in URL");
             navigate("/login");
         }
     }, [searchParams, dispatch, navigate]);
 
     return (
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
-            <h2>Авторизація... зачекайте</h2>
+        <div style={{ 
+            display: "flex", 
+            justifyContent: "center", 
+            alignItems: "center", 
+            height: "100vh",
+            backgroundColor: "#121212",
+            color: "white",
+            flexDirection: "column",
+            gap: "20px"
+        }}>
+            <div className="animate-spin" style={{ 
+                width: "40px", 
+                height: "40px", 
+                border: "4px solid #1DB954", 
+                borderTopColor: "transparent", 
+                borderRadius: "50%" 
+            }}></div>
+            <h2 style={{ fontFamily: "sans-serif" }}>Авторизація... зачекайте</h2>
         </div>
     );
 }
