@@ -88,7 +88,12 @@ export const api = createApi({
       }),
       transformResponse: (response: any) => response.data?.content || [],
     }),
+
+    getUserByUsername: builder.query<any, string>({
+      query: (username) => `users/getByUsername?username=${username}`,
+    transformResponse: (response: { data: any }) => response.data,
+    }),
   }),
 });
 
-export const { useLoginMutation, useRegisterMutation, useGetSongsQuery, useGetAlbumsQuery } = api;
+export const { useLoginMutation, useRegisterMutation, useGetSongsQuery, useGetAlbumsQuery, useGetUserByUsernameQuery } = api;
