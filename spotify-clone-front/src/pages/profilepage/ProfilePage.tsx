@@ -1,18 +1,31 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../../services/Api/authSlice';
+import { useGetUserByUsernameQuery } from '../../services/Api/api';
 import type { RootState } from '../../services/Api/store';
 import { LogOut, User as UserIcon, Mail, ShieldCheck } from 'lucide-react';
 
 const ProfilePage = () => {
-  const { user } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const { user: reduxUser } = useSelector((state: RootState) => state.auth);
+
+  const { data: profileResponse, isLoading } = useGetUserByUsernameQuery(
+    reduxUser?.username || '', 
+    { skip: !reduxUser?.username }
+  );
+
+  const user = profileResponse?.data || reduxUser;
 
   const handleLogout = () => {
     dispatch(logout());
     navigate('/');
   };
+
+  if (isLoading && !user?.username) {
+    return <div className="flex justify-center mt-20 text-white">Завантаження профілю...</div>;
+  }
 
   return (
     <div className="max-w-4xl mx-auto mt-8">
@@ -24,12 +37,15 @@ const ProfilePage = () => {
           
           <div className="text-center md:text-left">
             <h1 className="text-4xl font-black tracking-tight text-white mb-2">
-              {user?.username}
+              {/* Тепер тут завжди буде ім'я */}
+              {user?.username || "Користувач"}
             </h1>
             <div className="flex flex-wrap justify-center md:justify-start gap-4 text-text-muted">
               <div className="flex items-center gap-2">
                 <Mail size={16} className="text-primary" />
-                <span className="text-sm">{user?.email}</span>
+                <span className="text-sm">
+                  {user?.email || (isLoading ? "Завантаження..." : "Email не вказано")}
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <ShieldCheck size={16} className="text-primary" />

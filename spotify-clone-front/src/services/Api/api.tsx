@@ -35,19 +35,28 @@ export const api = createApi({
         method: 'POST',
         body: credentials,
       }),
-      async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
-        try {
-          const { data: response } = await queryFulfilled;
-          if (response.success && response.data) {
-            dispatch(setCredentials({
-              accessToken: response.data.accessToken,
-              refreshToken: response.data.refreshToken,
-              user: response.data.user || null
-            }));
-          }
-        } catch (err) {
-          console.error('Auth failed:', err);
+async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+  try {
+    const { data: response } = await queryFulfilled;
+    if (response.success && response.data) {
+      
+      const identifier = arg.login;
+      const extractedUsername = identifier.includes('@') 
+        ? identifier.split('@')[0] 
+        : identifier;
+
+      dispatch(setCredentials({
+        accessToken: response.data.accessToken,
+        refreshToken: response.data.refreshToken,
+        user: { 
+          username: extractedUsername, 
+          email: identifier.includes('@') ? identifier : ''
         }
+      }));
+    }
+  } catch (err) {
+    console.error('Login failed:', err);
+  }
       },
     }),
 
