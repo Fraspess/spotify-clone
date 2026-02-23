@@ -30,6 +30,10 @@ const Home = () => {
     );
   }
 
+  const playMusic = (music) => {
+    console.log(music);
+  }
+
   return (
     <div className="space-y-12 p-6 pb-24">
       <section>
@@ -133,7 +137,7 @@ const Home = () => {
                     </div>
                   </div>
                   <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded">
-                    <Play size={16} fill="white" className="text-white" />
+                    <Play onClick={event => {event.preventDefault(); playMusic(song.songFileName)}} size={16} fill="white" className="text-white" />
                   </div>
                 </div>
 

@@ -35,7 +35,7 @@ const authSlice = createSlice({
       if (payload.refreshToken) state.refreshToken = payload.refreshToken;
       if (payload.user) state.user = payload.user;
 
-      localStorage.setItem('accessToken', payload.accessToken);
+      localStorage.setItem("accessToken",payload.accessToken);
       if (payload.refreshToken) localStorage.setItem('refreshToken', payload.refreshToken);
       if (payload.user) localStorage.setItem('user', JSON.stringify(payload.user));
     },
