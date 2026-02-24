@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/sidebar/Sidebar';
-import Footer from '../components/footer/Footer';
+import Player from '../components/Footer/Player.tsx';
 import Topbar from '../components/topbar/Topbar';
 
 const MainLayout = () => {
@@ -15,7 +15,7 @@ const MainLayout = () => {
             </main>
             </div>
       </div>
-      <Footer />
+      <Player />
     </div>
   );
 };

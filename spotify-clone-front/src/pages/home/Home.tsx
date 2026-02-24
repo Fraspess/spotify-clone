@@ -2,10 +2,13 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGetSongsQuery, useGetAlbumsQuery } from '../../services/Api/api';
 import { Play, Disc, Music, Plus } from 'lucide-react';
+import {useDispatch} from "react-redux";
+import {playSong} from "../../services/Api/songSlice.tsx";
 
 const Home = () => {
   const navigate = useNavigate();
   const [songLimit, setSongLimit] = useState(20);
+  const dispatch = useDispatch();
 
   const { data: albumsData, isLoading: albumsLoading } = useGetAlbumsQuery({ page: 0, size: 6 }) as any;
   const { data: songsData, isLoading: songsLoading, isFetching } = useGetSongsQuery({ 
@@ -32,6 +35,13 @@ const Home = () => {
 
   const playMusic = (music) => {
     console.log(music);
+      dispatch(playSong({
+        id: music.id,
+        title: music.title,
+        artist: music.artist,
+        image: music.image,
+        songFileName: music.songFileName,
+      }))
   }
 
   return (
@@ -137,7 +147,7 @@ const Home = () => {
                     </div>
                   </div>
                   <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded">
-                    <Play onClick={event => {event.preventDefault(); playMusic(song.songFileName)}} size={16} fill="white" className="text-white" />
+                    <Play onClick={event => {event.preventDefault(); playMusic(song)}} size={16} fill="white" className="text-white" />
                   </div>
                 </div>
 
