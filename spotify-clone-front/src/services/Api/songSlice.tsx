@@ -5,6 +5,9 @@ import type {MusicState} from "../../types/music/MusicState.ts";
 const initialState: MusicState = {
     currentSong: null,
     isPlaying: false,
+    volume: 100,
+    currentTime: 0,
+    duration: 0,
 };
 const songSlice = createSlice({
     name:"song",
@@ -20,10 +23,18 @@ const songSlice = createSlice({
         stopSong: (state) => {
             state.currentSong = null;
             state.isPlaying = false;
+        },
+        setCurrentTime: (state, action: PayloadAction<number>) => {
+            state.currentTime = action.payload;
+        },
+        setDuration: (state, action: PayloadAction<number>) => {
+            state.duration = action.payload;
+        },
+        setVolume: (state, action: PayloadAction<number>) => {
+            state.volume = action.payload;
         }
     }
 })
 
-
-export const {playSong, togglePlay, stopSong} = songSlice.actions;
+export const {playSong, togglePlay, stopSong, setVolume, setCurrentTime, setDuration} = songSlice.actions;
 export default songSlice.reducer;
