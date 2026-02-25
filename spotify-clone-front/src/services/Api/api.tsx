@@ -31,7 +31,7 @@ interface UserResponse {
 
 const baseQuery = fetchBaseQuery({
     baseUrl: APP_ENV.BACKEND_URL + '/api',
-    prepareHeaders: (headers, { getState }) => {
+    prepareHeaders: (headers, {getState}) => {
         const token = localStorage.getItem('accessToken');
         if (token) {
             headers.set('authorization', `Bearer ${token}`);
@@ -50,7 +50,7 @@ const baseQueryWithReauth = async (args: any, api: any, extraOptions: any) => {
                 {
                     url: 'users/refresh',
                     method: 'POST',
-                    body: { token: localStorage.getItem("refreshToken") },
+                    body: {token: localStorage.getItem("refreshToken")},
                 },
                 api,
                 extraOptions
@@ -163,6 +163,12 @@ export const api = createApi({
                     query: (username) => `users/getByUsername?username=${username}`,
                     transformResponse: (response: { data: any }) => response.data,
                 }),
+
+            getRandomSong:
+                builder.query<any, any>({
+                    query: () => `songs/random`,
+                    transformResponse:(response: {data:any}) => response.data,
+                })
         }),
     })
 ;
@@ -175,4 +181,5 @@ export const {
     useGetUserByUsernameQuery,
     useRegisterRequestMutation,
     useGetMeQuery,
+    useGetRandomSongQuery
 } = api;

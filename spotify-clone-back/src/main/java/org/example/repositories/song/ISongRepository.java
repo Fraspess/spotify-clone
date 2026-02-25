@@ -21,5 +21,9 @@ public interface ISongRepository extends JpaRepository<SongEntity, Long> {
        OR LOWER(a.username) LIKE LOWER(CONCAT('%', :q, '%'))
     """)
     List<SongEntity> search(@Param("q") String q);
+
+
+    @Query(value = "SELECT * FROM songs ORDER BY RANDOM() LIMIT 1", nativeQuery = true)
+    SongEntity findRandomSong();
 }
 

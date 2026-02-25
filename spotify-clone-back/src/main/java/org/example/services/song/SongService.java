@@ -154,4 +154,9 @@ public class SongService {
     public List<SongResponseDTO> search(String q) {
         return songMapper.fromEntityList(songRepository.search(q));
     }
+
+
+    public SongResponseDTO getRandomSong(){
+        return songMapper.fromEntity(songRepository.findRandomSong());
+    }
 }

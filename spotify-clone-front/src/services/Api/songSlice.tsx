@@ -8,12 +8,19 @@ const initialState: MusicState = {
     volume: 100,
     currentTime: 0,
     duration: 0,
+    currentIndex: 0,
+    songs: []
 };
 const songSlice = createSlice({
     name:"song",
     initialState,
     reducers:{
         playSong:(state, action: PayloadAction<Song>) => {
+            const index = state.songs.findIndex(
+                song => song.id === action.payload.id
+            );
+
+            state.currentIndex = index !== -1 ? index : 0;
             state.currentSong = action.payload;
             state.isPlaying = true;
         },
@@ -32,9 +39,34 @@ const songSlice = createSlice({
         },
         setVolume: (state, action: PayloadAction<number>) => {
             state.volume = action.payload;
+        },
+        playNextSong: (state) => {
+            if(state.songs.length == 0) return;
+
+            const nextIndex = state.currentIndex < state.songs.length - 1 ? state.currentIndex + 1 : 0;
+
+            state.currentIndex = nextIndex;
+            state.currentSong = state.songs[nextIndex];
+            state.isPlaying = true;
+        },
+        playPreviousSong: (state) => {
+            if (state.songs.length === 0) return;
+
+            const prevIndex =
+                state.currentIndex > 0
+                    ? state.currentIndex - 1
+                    : state.songs.length - 1;
+
+            state.currentIndex = prevIndex;
+            state.currentSong = state.songs[prevIndex];
+            state.isPlaying = true;
+        },
+        setSongs: (state, action: PayloadAction<Song[]>) => {
+            state.songs = action.payload;
         }
+
     }
 })
 
-export const {playSong, togglePlay, stopSong, setVolume, setCurrentTime, setDuration} = songSlice.actions;
+export const {playSong, togglePlay, stopSong, setVolume, setCurrentTime, setDuration, playPreviousSong, playNextSong, setSongs} = songSlice.actions;
 export default songSlice.reducer;

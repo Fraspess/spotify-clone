@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import {useEffect, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGetSongsQuery, useGetAlbumsQuery } from '../../services/Api/api';
 import { Play, Disc, Music, Plus } from 'lucide-react';
 import {useDispatch} from "react-redux";
-import {playSong} from "../../services/Api/songSlice.tsx";
+import {playSong, setSongs} from "../../services/Api/songSlice.tsx";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -22,6 +22,12 @@ const Home = () => {
   const handleLoadMore = () => {
     setSongLimit(prev => prev + 20);
   };
+
+  useEffect(() => {
+    if(songs.length > 0){
+      dispatch(setSongs(songs));
+    }
+  }, [songs, dispatch]);
 
   const IMAGE_BASE_URL = "http://localhost:8080/music_images";
 
