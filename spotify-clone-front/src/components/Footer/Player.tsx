@@ -12,11 +12,13 @@ import {
 import {audio} from "../../services/audio/audio.ts";
 import {useEffect} from "react";
 import {APP_ENV} from "../../env";
+import {useFavoriteSongMutation} from "../../services/Api/api.tsx";
 
 const Player = () => {
   const dispatch = useDispatch();
   const {currentSong, isPlaying, currentTime, duration, volume, songs} =
       useSelector((state: RootState) => state.song);
+  const [favoriteSong] = useFavoriteSongMutation();
 
   const formatTime = (time: number) => {
     if (!time) return "0:00";
@@ -120,7 +122,7 @@ const Player = () => {
             {currentSong?.artist || "Пісня не обрана"}
           </p>
         </div>
-        <button className="text-text-muted hover:text-primary transition ml-2">
+        <button onClick={() => favoriteSong(currentSong?.id)} className="text-text-muted hover:text-primary transition ml-2">
           ❤️
         </button>
       </div>

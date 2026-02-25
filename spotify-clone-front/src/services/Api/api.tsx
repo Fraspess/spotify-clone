@@ -168,7 +168,15 @@ export const api = createApi({
                 builder.query<any, any>({
                     query: () => `songs/random`,
                     transformResponse:(response: {data:any}) => response.data,
-                })
+                }),
+            favoriteSong:
+                builder.mutation<any, { id: number}>({
+                    query: (id) => ({
+                        url: 'songs/favorite-song',
+                        method: 'POST',
+                        body: {id},
+                    }),
+                }),
         }),
     })
 ;
@@ -181,5 +189,5 @@ export const {
     useGetUserByUsernameQuery,
     useRegisterRequestMutation,
     useGetMeQuery,
-    useGetRandomSongQuery
+    useFavoriteSongMutation
 } = api;
