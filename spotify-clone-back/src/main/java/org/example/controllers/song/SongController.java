@@ -91,4 +91,10 @@ public class SongController {
         var songs = songService.search(q);
         return ResponseEntity.status(HttpStatus.OK).body(new ServerResponse<>(true, "", songs));
     }
+
+    @GetMapping("/random")
+    public ResponseEntity<ServerResponse<?>> getRandomSong(){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ServerResponse<>(true, null, songService.getRandomSong()));
+    }
 }

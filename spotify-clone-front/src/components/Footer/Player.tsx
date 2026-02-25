@@ -1,14 +1,21 @@
 import {Play, SkipBack, SkipForward, Repeat, Shuffle, Volume2, Pause} from 'lucide-react';
 import {useDispatch, useSelector} from "react-redux";
 import type {RootState} from "../../services/Api/store.tsx";
-import {setCurrentTime, setDuration, setVolume, togglePlay} from "../../services/Api/songSlice.tsx";
+import {
+  playNextSong,
+  playPreviousSong,
+  setCurrentTime,
+  setDuration, setSongs,
+  setVolume,
+  togglePlay
+} from "../../services/Api/songSlice.tsx";
 import {audio} from "../../services/audio/audio.ts";
 import {useEffect} from "react";
 import {APP_ENV} from "../../env";
 
 const Player = () => {
   const dispatch = useDispatch();
-  const {currentSong, isPlaying, currentTime, duration, volume} =
+  const {currentSong, isPlaying, currentTime, duration, volume, songs} =
       useSelector((state: RootState) => state.song);
 
   const formatTime = (time: number) => {
@@ -51,9 +58,11 @@ const Player = () => {
   useEffect(() => {
     if (currentSong) {
       audio.src = APP_ENV.BACKEND_URL + `/music/${currentSong.songFileName}` || "";
+      audio.currentTime = 0;
       audio.play();
     }
   }, [currentSong]);
+
 
 
   useEffect(() => {
@@ -80,6 +89,19 @@ const Player = () => {
     };
   }, [dispatch]);
 
+  useEffect(() => {
+    const handleEnded = () => {
+      dispatch(playNextSong());
+    }
+
+    audio.addEventListener("ended", handleEnded);
+
+
+    return () => {
+      audio.removeEventListener("ended", handleEnded);
+    }
+  },[dispatch]);
+
 
   return (
     <footer className="h-[90px] bg-black border-t border-border-subtle px-4 flex items-center justify-between">
@@ -105,8 +127,8 @@ const Player = () => {
 
       <div className="flex flex-col items-center max-w-[45%] w-full gap-y-2">
         <div className="flex items-center gap-x-6 text-text-muted">
-          <button className="hover:text-text-main transition"><Shuffle size={20} /></button>
-          <button className="hover:text-text-main transition"><SkipBack size={24} fill="currentColor" /></button>
+          {/*<button className="hover:text-text-main transition"><Shuffle size={20} /></button>*/}
+          <button onClick={() => dispatch(playPreviousSong())} className="hover:text-text-main transition"><SkipBack size={24} fill="currentColor" /></button>
           <button onClick={() => dispatch(togglePlay())} className="bg-text-main text-black rounded-full p-2 hover:scale-105 transition active:scale-95">
             {isPlaying ? (
                 <Pause size={24} fill="black"/>
@@ -114,8 +136,8 @@ const Player = () => {
                  <Play size={24} fill="black" />
             )}
           </button>
-          <button className="hover:text-text-main transition"><SkipForward size={24} fill="currentColor" /></button>
-          <button className="hover:text-text-main transition"><Repeat size={20} /></button>
+          <button onClick={() => dispatch(playNextSong())} className="hover:text-text-main transition"><SkipForward size={24} fill="currentColor" /></button>
+          {/*<button className="hover:text-text-main transition"><Repeat size={20} /></button>*/}
         </div>
         
         <div className="flex items-center gap-x-2 w-full max-w-md group">
