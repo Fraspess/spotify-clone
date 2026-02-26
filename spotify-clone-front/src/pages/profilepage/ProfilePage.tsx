@@ -1,12 +1,8 @@
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../../services/Api/authSlice';
-import { useGetUserByUsernameQuery } from '../../services/Api/api';
-import type { RootState } from '../../services/Api/store';
 import { LogOut, User as UserIcon, Mail, ShieldCheck } from 'lucide-react';
 import {useGetMeQuery} from "../../services/Api/api.tsx";
-import {useEffect, useState} from "react";
-
 const ProfilePage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();

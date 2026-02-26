@@ -7,6 +7,7 @@ import ProfilePage from './pages/profilepage/ProfilePage.tsx';
 import AllAlbumsPage from './pages/allalbumspage/AllAlbumsPage.tsx';
 import Oauth2GoogleCallback from "./components/oauth2/Oauth2GoogleCallback.tsx";
 import ConfirmRegisterPage from "./pages/confirmRegisterPage/ConfirmRegisterPage.tsx";
+import AlbumPage from './pages/albumpage/albumpage.tsx';
 
 function App() {
   return (
@@ -21,8 +22,10 @@ function App() {
           <Route path="profile" element={<ProfilePage />} />
 
           <Route path="all-albums" element={<AllAlbumsPage />} />
-
+          <Route path="/album/:id" element={<AlbumPage />} />
+          
           <Route path="/oauth2/callback" element={<Oauth2GoogleCallback/>}/>
+
 
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
