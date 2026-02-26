@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import type { SyntheticEvent, ChangeEvent } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useDispatch } from 'react-redux';
-import {useLoginMutation, useRegisterMutation, useRegisterRequestMutation} from '../../services/Api/api';
+import {useLoginMutation, useRegisterRequestMutation} from '../../services/Api/api';
 import { setCredentials } from '../../services/Api/authSlice';
 import { ArrowLeft } from "lucide-react";
 import { APP_ENV } from "../../env";

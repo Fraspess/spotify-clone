@@ -177,6 +177,14 @@ export const api = createApi({
                         body: {id},
                     }),
                 }),
+            getAlbumById: builder.query<any, number | string>({
+                query: (id) => ({
+                    url: 'albums/getById',
+                    method: 'GET',
+                    params: { id },
+                }),
+                transformResponse: (response: { data: any }) => response.data,
+                }),
         }),
     })
 ;
@@ -189,5 +197,6 @@ export const {
     useGetUserByUsernameQuery,
     useRegisterRequestMutation,
     useGetMeQuery,
-    useFavoriteSongMutation
+    useFavoriteSongMutation,
+    useGetAlbumByIdQuery
 } = api;
