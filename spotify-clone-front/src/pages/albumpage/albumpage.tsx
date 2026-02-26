@@ -6,12 +6,11 @@ import { playSong, setSongs } from "../../services/Api/songSlice.tsx";
 import { APP_ENV } from '../../env/index.ts';
 
 const AlbumPage = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-    const IMAGE_BASE_URL = `${APP_ENV.BACKEND_URL}/music_images`;
-
-  const { data: album, isLoading, error } = useGetAlbumByIdQuery(id!);
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const IMAGE_BASE_URL = APP_ENV.IMAGE_BASE_URL;
+    const { data: album, isLoading, error } = useGetAlbumByIdQuery(id!);
 
   if (isLoading) {
     return (

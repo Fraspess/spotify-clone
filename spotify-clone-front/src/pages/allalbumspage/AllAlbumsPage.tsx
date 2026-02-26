@@ -1,6 +1,7 @@
 import { useGetAlbumsQuery } from '../../services/Api/api';
 import { useNavigate } from 'react-router-dom';
 import { Disc, Play, ArrowLeft } from 'lucide-react';
+import { APP_ENV } from '../../env/index.ts';
 
 const AllAlbumsPage = () => {
   const navigate = useNavigate();
@@ -8,7 +9,8 @@ const AllAlbumsPage = () => {
   const { data: albumsData, isLoading } = useGetAlbumsQuery({ page: 0, size: 50 }) as any;
   const albums = albumsData?.content || (Array.isArray(albumsData) ? albumsData : []);
 
-  const IMAGE_BASE_URL = "http://localhost:8080/music_images";
+    const IMAGE_BASE_URL = APP_ENV.IMAGE_BASE_URL;
+
 
   if (isLoading) {
     return (

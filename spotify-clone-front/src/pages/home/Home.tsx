@@ -4,6 +4,7 @@ import { useGetSongsQuery, useGetAlbumsQuery } from '../../services/Api/api';
 import { Play, Disc, Music, Plus } from 'lucide-react';
 import {useDispatch} from "react-redux";
 import {playSong, setSongs} from "../../services/Api/songSlice.tsx";
+import { APP_ENV } from '../../env/index.ts';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ const Home = () => {
     }
   }, [songs, dispatch]);
 
-  const IMAGE_BASE_URL = "http://localhost:8080/music_images";
+    const IMAGE_BASE_URL = APP_ENV.IMAGE_BASE_URL;
 
   if (albumsLoading && songsLoading) {
     return (
