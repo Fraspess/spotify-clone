@@ -1,16 +1,20 @@
-import { Link, useLocation } from 'react-router-dom';
-import { Home, Library, Plus } from 'lucide-react'; 
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Home, Library, Plus, Heart } from 'lucide-react'; 
+import { useGetMeQuery } from '../../services/Api/api.tsx';
 
 const Sidebar = () => {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+  
+  const { data: userData } = useGetMeQuery();
+  const isAuth = !!userData;
 
   const navItems = [
-    { name: 'Головна', path: '/', icon: Home },
+    { name: 'Головна', path: '/', icon: Home }
   ];
 
   return (
-    <aside className="w-64 flex flex-col gap-y-2 h-full bg-black p-2">
-      
+    <aside className="w-64 flex flex-col gap-y-2 h-full bg-black p-2 select-none">
       <div className="rounded-xl bg-bg-elevated p-4 flex flex-col gap-y-5">
         {navItems.map((item) => {
           const isActive = pathname === item.path;
@@ -43,28 +47,23 @@ const Sidebar = () => {
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto space-y-2 mt-4 custom-scrollbar">
-          <div className="flex items-center gap-x-3 p-2 rounded-lg hover:bg-bg-elevated-soft cursor-pointer transition group">
-            <div className="w-12 h-12 rounded bg-gradient-to-br from-primary-dark to-primary flex items-center justify-center shadow-lg">
-              <span className="text-white">❤️</span>
-            </div>
-            <div className="flex flex-col">
-              <p className="text-sm font-semibold text-text-main">Улюблені пісні</p>
-              <p className="text-xs text-text-muted">Плейлист • 124 треки</p>
-            </div>
-          </div>
-
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="flex items-center gap-x-3 p-2 rounded-lg hover:bg-bg-elevated-soft cursor-pointer transition group">
-              <div className="w-12 h-12 rounded bg-bg-elevated-soft flex items-center justify-center">
-                <span className="text-text-muted text-xs font-bold">PL</span>
+        <div className="flex-1 overflow-y-auto mt-4 custom-scrollbar">
+          {isAuth && (
+            <div 
+              onClick={() => navigate('/favorite-songs')}
+              className={`flex items-center gap-x-3 p-2 rounded-lg hover:bg-bg-elevated-soft cursor-pointer transition group ${
+                pathname === '/favorite-songs' ? 'bg-bg-elevated-soft' : ''
+              }`}
+            >
+              <div className="w-12 h-12 rounded bg-gradient-to-br from-[#450af5] to-[#c4efd9] flex items-center justify-center shadow-lg text-white shrink-0">
+                <Heart size={20} fill="white" />
               </div>
-              <div className="flex flex-col">
-                <p className="text-sm font-semibold text-text-main">Мій плейлист #{i}</p>
-                <p className="text-xs text-text-muted">Плейлист • Користувач</p>
+              <div className="flex flex-col truncate">
+                <p className="text-sm font-semibold text-text-main">Улюблені пісні</p>
+                <p className="text-xs text-text-muted">Плейлист</p>
               </div>
             </div>
-          ))}
+          )}
         </div>
       </div>
     </aside>

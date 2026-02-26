@@ -1,9 +1,9 @@
 import {useEffect, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGetSongsQuery, useGetAlbumsQuery } from '../../services/Api/api';
-import { Play, Disc, Music, Plus } from 'lucide-react';
+import { Play, Disc, Music, LoaderCircle } from 'lucide-react';
 import {useDispatch} from "react-redux";
-import {playSong, setSongs} from "../../services/Api/songSlice.tsx";
+import {playSong } from "../../services/Api/songSlice.tsx";
 import { APP_ENV } from '../../env/index.ts';
 
 const Home = () => {
@@ -20,17 +20,30 @@ const Home = () => {
   const albums = albumsData?.content || (Array.isArray(albumsData) ? albumsData : []);
   const songs = songsData?.content || (Array.isArray(songsData) ? songsData : []);
 
+  const totalElements = songsData?.totalElements || 0;
+  const hasMore = songs.length < totalElements;
+
   const handleLoadMore = () => {
     setSongLimit(prev => prev + 20);
   };
 
   useEffect(() => {
-    if(songs.length > 0){
-      dispatch(setSongs(songs));
-    }
-  }, [songs, dispatch]);
+    const handleScroll = () => {
+      console.log("Скролимо...");
+      const scrollHeight = document.documentElement.scrollHeight;
+      const scrollTop = document.documentElement.scrollTop;
+      const clientHeight = window.innerHeight;
 
-    const IMAGE_BASE_URL = APP_ENV.IMAGE_BASE_URL;
+      if (scrollHeight - scrollTop - clientHeight < 150 && !isFetching && hasMore) {
+        setSongLimit(prev => prev + 20);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isFetching, hasMore]);
+
+  const IMAGE_BASE_URL = APP_ENV.IMAGE_BASE_URL;
 
   if (albumsLoading && songsLoading) {
     return (
@@ -40,8 +53,7 @@ const Home = () => {
     );
   }
 
-  const playMusic = (music) => {
-    console.log(music);
+  const playMusic = (music: any) => {
       dispatch(playSong({
         id: music.id,
         title: music.title,
@@ -53,6 +65,7 @@ const Home = () => {
 
   return (
     <div className="space-y-12 p-6 pb-24">
+
       <section>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-extrabold tracking-tight">Популярні альбоми</h2>
@@ -67,7 +80,6 @@ const Home = () => {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
           {albums.map((album: any) => {
             const albumImg = album.image || album.coverUrl || (album.songs && album.songs[0]?.image);
-            
             return (
               <div 
                 key={album.id} 
@@ -77,38 +89,22 @@ const Home = () => {
                 <div className="aspect-square mb-4 relative rounded-lg overflow-hidden bg-zinc-800 flex items-center justify-center">
                   {albumImg ? (
                     <img 
-                      src={
-                        albumImg.startsWith('http') 
-                          ? albumImg 
-                          : `${IMAGE_BASE_URL}/large/${albumImg}${albumImg.includes('.') ? '' : '.webp'}`
-                      } 
+                      src={albumImg.startsWith('http') ? albumImg : `${IMAGE_BASE_URL}/large/${albumImg}${albumImg.includes('.') ? '' : '.webp'}`} 
                       alt={album.title} 
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
-                      onError={(e) => {
-                        console.log("Помилка завантаження картинки за адресою:", e.currentTarget.src);
-                        e.currentTarget.style.display = 'none';
-                        e.currentTarget.parentElement?.querySelector('.fallback-disc')?.classList.remove('hidden');
-                      }}
                     />
                   ) : null}
-
                   <div className={`fallback-disc ${albumImg ? 'hidden' : ''}`}>
                     <Disc size={64} className="text-zinc-700 group-hover:text-primary transition-colors duration-300" />
                   </div>
-                  
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <button className="bg-primary p-4 rounded-full shadow-2xl transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
                       <Play fill="black" size={24} className="text-black ml-1" />
                     </button>
                   </div>
                 </div>
-
-                <h3 className="font-bold text-sm truncate text-text-main">
-                  {album.title}
-                </h3>
-                <p className="text-xs text-text-muted truncate mt-1">
-                  {album.artist || "Невідомий виконавець"}
-                </p>
+                <h3 className="font-bold text-sm truncate text-text-main">{album.title}</h3>
+                <p className="text-xs text-text-muted truncate mt-1">{album.artist || "Невідомий виконавець"}</p>
               </div>
             );
           })}
@@ -132,20 +128,11 @@ const Home = () => {
                   <div className="w-full h-full bg-zinc-800 rounded shadow-md flex items-center justify-center overflow-hidden">
                     {song.image ? (
                       <img 
-                        src={
-                          song.image.startsWith('http')
-                          ? song.image
-                          : `${IMAGE_BASE_URL}/medium/${song.image}${song.image.includes('.') ? '' : '.webp'}`
-                        } 
+                        src={song.image.startsWith('http') ? song.image : `${IMAGE_BASE_URL}/medium/${song.image}${song.image.includes('.') ? '' : '.webp'}`} 
                         alt={song.title} 
                         className="w-full h-full object-cover" 
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                          e.currentTarget.parentElement?.querySelector('.fallback')?.classList.remove('hidden');
-                        }}
                       />
                     ) : null}
-                    
                     <div className={`fallback ${song.image ? 'hidden' : ''}`}>
                       <Music size={20} className="text-zinc-600" />
                     </div>
@@ -154,41 +141,50 @@ const Home = () => {
                     <Play onClick={event => {event.preventDefault(); playMusic(song)}} size={16} fill="white" className="text-white" />
                   </div>
                 </div>
-
                 <div className="truncate">
-                  <div className="font-semibold text-sm text-text-main truncate group-hover:text-primary transition-colors">
-                    {song.title}
-                  </div>
-                  <div className="text-xs text-text-muted truncate mt-0.5">
-                    {song.artist || 'Невідомий виконавець'}
-                  </div>
+                  <div className="font-semibold text-sm text-text-main truncate group-hover:text-primary transition-colors">{song.title}</div>
+                  <div className="text-xs text-text-muted truncate mt-0.5">{song.artist || 'Невідомий виконавець'}</div>
                 </div>
               </div>
-
               <div className="flex items-center gap-6 ml-4">
-                <button className="opacity-0 group-hover:opacity-100 text-text-muted hover:text-primary transition-all">
-                  <Plus size={18} />
-                </button>
                 <span className="text-right text-xs text-text-muted font-mono w-10">
-                   {song.durationInSeconds ? 
-                    `${Math.floor(song.durationInSeconds / 60)}:${String(song.durationInSeconds % 60).padStart(2, '0')}` 
-                    : '3:45'}
+                   {song.durationInSeconds ? `${Math.floor(song.durationInSeconds / 60)}:${String(song.durationInSeconds % 60).padStart(2, '0')}` : '3:45'}
                 </span>
               </div>
             </div>
           ))}
         </div>
 
-        <div className="mt-12 flex flex-col items-center gap-4">
-          <button 
-            onClick={handleLoadMore}
-            disabled={isFetching}
-            className="group relative px-12 py-4 rounded-full bg-white text-black font-bold text-sm overflow-hidden hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
-          >
-            <span className="relative z-10">{isFetching ? 'Завантаження...' : 'Показати ще'}</span>
-            <div className="absolute inset-0 bg-primary opacity-0 group-hover:opacity-20 transition-opacity"></div>
-          </button>
-        </div>
+        {isFetching && hasMore && (
+          <div className="flex justify-center mt-10">
+            <LoaderCircle size={32} className="text-primary animate-spin" />
+          </div>
+        )}
+
+        {!hasMore && songs.length > 0 && (
+          <div className="mt-16 mb-8 flex flex-col items-center gap-4">
+            <div className="h-[1px] w-full max-w-[200px] bg-white/10"></div>
+            <p className="text-xs text-text-muted font-bold opacity-50 uppercase tracking-widest text-center">
+              Ви прослухали все! В базі більше немає треків.
+            </p>
+            <Music size={24} className="text-text-muted opacity-20" />
+          </div>
+        )}
+
+        {hasMore && (
+          <div className="mt-12 flex flex-col items-center gap-4">
+            <button 
+              onClick={handleLoadMore}
+              disabled={isFetching}
+              className="group relative px-12 py-4 rounded-full bg-white text-black font-bold text-sm hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
+            >
+              <div className="flex items-center gap-2">
+                {isFetching && <LoaderCircle size={18} className="animate-spin" />}
+                <span className="relative z-10">{isFetching ? 'Завантаження...' : 'Показати ще'}</span>
+              </div>
+            </button>
+          </div>
+        )}
       </section>
     </div>
   );
