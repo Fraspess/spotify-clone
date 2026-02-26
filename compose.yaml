@@ -1,0 +1,14 @@
+  api:
+    build: spotify-clone-back/
+    image: frasp/spotify-clone-back:latest
+    container_name: api
+    environment:
+      - frontend.url=http://localhost:5173
+    ports:
+      - "8080:8080"
+    networks:
+      - pd421_spotify-clone
+
+  networks:
+    pd421_spotify-clone:
+    name: "pd421_spotify-clone"

@@ -1,0 +1,18 @@
+FROM maven:3.9.9-eclipse-temurin-21 AS build
+
+WORKDIR /app
+
+COPY pom.xml .
+COPY src ./src
+
+RUN mvn clean package
+
+FROM eclipse-temurin:21-jre-alpine
+
+WORKDIR /app
+
+EXPOSE 8080
+
+COPY --from=build /app/target/spotify-clone-back-*.jar ./spotify-clone-back.jar
+
+CMD ["java", "-jar", "/app/spotify-clone-back.jar"]

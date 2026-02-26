@@ -20,18 +20,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
-    </repositories>
-
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <version>4.0.2</version>
         </dependency>
 
         <dependency>
@@ -43,19 +35,18 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
-            <version>4.0.2</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
-            <version>4.0.2</version>
         </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.42</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.mapstruct/mapstruct -->
@@ -63,6 +54,7 @@
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
             <version>1.6.3</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.mapstruct/mapstruct-processor -->
@@ -76,7 +68,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
-            <version>4.0.2</version>
         </dependency>
 
         <dependency>
@@ -142,19 +133,13 @@
             <version>1.21.2</version>
         </dependency>
 
-        <!-- Source: https://mvnrepository.com/artifact/com.github.a-schild.jave2/jave-core -->
-        <dependency>
-            <groupId>com.github.a-schild.jave2</groupId>
-            <artifactId>jave-core</artifactId>
-            <version>3.5.0</version>
-            <scope>compile</scope>
-        </dependency>
 
         <dependency>
             <groupId>ws.schild</groupId>
-            <artifactId>jave-nativebin-win64</artifactId>
+            <artifactId>jave-all-deps</artifactId>
             <version>3.5.0</version>
         </dependency>
+
 
         <!-- Source: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-oauth2-client -->
         <dependency>
@@ -171,4 +156,20 @@
         </dependency>
 
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
