@@ -109,9 +109,6 @@ const Home = () => {
                 <p className="text-xs text-text-muted truncate mt-1">
                   {album.artist || "Невідомий виконавець"}
                 </p>
-                <p className="text-[10px] text-zinc-500 mt-2 uppercase tracking-tighter font-medium">
-                  Треків: {album.songs?.length || 0}
-                </p>
               </div>
             );
           })}

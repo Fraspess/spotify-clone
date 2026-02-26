@@ -185,6 +185,14 @@ export const api = createApi({
                 }),
                 transformResponse: (response: { data: any }) => response.data,
                 }),
+                searchSongs: builder.query<any, string>({
+                query: (search) => ({
+                    url: 'songs/search',
+                    method: 'GET',
+                    params: { q: search },
+                }),
+                transformResponse: (response: { data: any }) => response.data,
+            }),
         }),
     })
 ;
@@ -198,5 +206,6 @@ export const {
     useRegisterRequestMutation,
     useGetMeQuery,
     useFavoriteSongMutation,
-    useGetAlbumByIdQuery
+    useGetAlbumByIdQuery,
+    useSearchSongsQuery,
 } = api;

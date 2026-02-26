@@ -1,19 +1,36 @@
-import { Search, User } from 'lucide-react'; // static icon pike ne merge pashu
-import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { Search, User } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../services/Api/store';
 
 const Topbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchParams] = useSearchParams();
+  
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || "");
 
   const { accessToken, user } = useSelector((state: RootState) => state.auth);
 
+  useEffect(() => {
+    if (location.pathname !== '/search') {
+      setSearchQuery("");
+    }
+  }, [location.pathname]);
+
+  const handleSearchChange = (val: string) => {
+    setSearchQuery(val);
+    
+    if (val.trim() === "") {
+      navigate('/search', { replace: true });
+    } else {
+      navigate(`/search?q=${encodeURIComponent(val)}`, { replace: true });
+    }
+  };
+
   return (
     <header className="flex items-center gap-x-4 px-6 py-3 bg-black/20 backdrop-blur-md sticky top-0 z-50">
-      
       <div 
         onClick={() => navigate('/')} 
         className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition flex-shrink-0"
@@ -39,12 +56,7 @@ const Topbar = () => {
           type="text"
           placeholder="Що ви хочете послухати?"
           value={searchQuery}
-          onChange={(e) => {
-            const val = e.target.value;
-            setSearchQuery(val); 
-            if (val.trim() === "") navigate('/');
-            else if (location.pathname !== '/search') navigate('/search');
-          }}
+          onChange={(e) => handleSearchChange(e.target.value)}
           className="w-full bg-bg-elevated hover:bg-bg-elevated-soft border border-transparent focus:border-white/20 rounded-full py-2.5 pl-10 pr-10 text-sm text-white placeholder:text-text-muted outline-none transition-all shadow-inner"
         />
       </div>
