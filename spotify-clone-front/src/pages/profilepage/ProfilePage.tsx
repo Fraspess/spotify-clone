@@ -2,7 +2,7 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../../services/Api/authSlice';
 import { LogOut, User as UserIcon, Mail, ShieldCheck } from 'lucide-react';
-import {useGetMeQuery} from "../../services/Api/api.tsx";
+import {useGetMeQuery, api} from "../../services/Api/api.tsx";
 const ProfilePage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -11,6 +11,7 @@ const ProfilePage = () => {
 
   const handleLogout = () => {
     dispatch(logout());
+    dispatch(api.util.resetApiState());
     navigate('/');
   };
   

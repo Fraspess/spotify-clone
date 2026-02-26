@@ -8,6 +8,7 @@ import AllAlbumsPage from './pages/allalbumspage/AllAlbumsPage.tsx';
 import Oauth2GoogleCallback from "./components/oauth2/Oauth2GoogleCallback.tsx";
 import ConfirmRegisterPage from "./pages/confirmRegisterPage/ConfirmRegisterPage.tsx";
 import AlbumPage from './pages/albumpage/albumpage.tsx';
+import FavoriteSongsPage from './pages/favouritesongpage/favouritesongspage.tsx';
 
 function App() {
   return (
@@ -20,7 +21,7 @@ function App() {
           <Route path="search" element={<SearchPage />} /> 
           
           <Route path="profile" element={<ProfilePage />} />
-
+          <Route path="/favorite-songs" element={<FavoriteSongsPage />} />
           <Route path="all-albums" element={<AllAlbumsPage />} />
           <Route path="/album/:id" element={<AlbumPage />} />
           

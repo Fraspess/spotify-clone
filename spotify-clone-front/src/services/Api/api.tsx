@@ -21,11 +21,21 @@ interface RegisterConfirmResponse {
     success: boolean;
 }
 
+interface Song {
+  id: number | string;
+  title: string;
+  artist: string;
+  image: string;
+  durationInSeconds: number;
+  songFileName: string;
+}
+
+
 interface UserResponse {
     email: string;
     id: number;
     username: string;
-
+    favoriteSongs?: Song[];
 }
 
 
@@ -77,7 +87,7 @@ const baseQueryWithReauth = async (args: any, api: any, extraOptions: any) => {
 
 export const api = createApi({
         reducerPath: 'api',
-
+        tagTypes: ['User', 'Songs'],
         baseQuery: baseQueryWithReauth,
         endpoints: (builder) => ({
             login: builder.mutation<AuthResponse, { login: string; password: string }>({
@@ -107,6 +117,7 @@ export const api = createApi({
                     method: 'GET'
                 }),
                 transformResponse: (response: { data: UserResponse }) => response.data,
+                providesTags: ['User'],
             }),
             registerRequest:
                 builder.mutation<RegisterConfirmResponse, { username: string; email: string; password: string }>({
@@ -147,6 +158,7 @@ export const api = createApi({
                         params: {page, size},
                     }),
                     transformResponse: (response: any) => response.data?.content || [],
+                    providesTags: ['Songs'],
                 }),
 
             getAlbums:
@@ -174,8 +186,9 @@ export const api = createApi({
                     query: (id) => ({
                         url: 'songs/favorite-song',
                         method: 'POST',
-                        body: {id},
+                        body: { id }, 
                     }),
+                    invalidatesTags: ['User'],
                 }),
             getAlbumById: builder.query<any, number | string>({
                 query: (id) => ({
