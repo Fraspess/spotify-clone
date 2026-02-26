@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Library, Plus, Heart, Search } from 'lucide-react'; 
+import { Home, Library, Plus, Heart } from 'lucide-react'; 
 import { useGetMeQuery } from '../../services/Api/api.tsx';
 
 const Sidebar = () => {
@@ -10,8 +10,7 @@ const Sidebar = () => {
   const isAuth = !!userData;
 
   const navItems = [
-    { name: 'Головна', path: '/', icon: Home },
-    { name: 'Пошук', path: '/search', icon: Search },
+    { name: 'Головна', path: '/', icon: Home }
   ];
 
   return (
