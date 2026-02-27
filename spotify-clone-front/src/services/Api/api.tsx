@@ -217,6 +217,12 @@ export const api = createApi({
                     },
                 }),
             }),
+            disableUser: builder.mutation<void, void>({
+                query: () => ({
+                    url: 'users/disable',
+                    method: 'DELETE',
+                }),
+            }),
             searchSongs: builder.query<any, string>({
                 query: (search) => ({
                     url: 'songs/search',
@@ -241,5 +247,6 @@ export const {
     useGetAlbumByIdQuery,
     useSearchSongsQuery,
     useForgotPasswordMutation,
-    useResetPasswordMutation
+    useResetPasswordMutation,
+    useDisableUserMutation
 } = api;
