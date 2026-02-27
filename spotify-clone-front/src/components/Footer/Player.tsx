@@ -1,11 +1,11 @@
-import {Play, SkipBack, SkipForward, Repeat, Shuffle, Volume2, Pause} from 'lucide-react';
+import {Play, SkipBack, SkipForward, Volume2, Pause} from 'lucide-react';
 import {useDispatch, useSelector} from "react-redux";
 import type {RootState} from "../../services/Api/store.tsx";
 import {
   playNextSong,
   playPreviousSong,
   setCurrentTime,
-  setDuration, setSongs,
+  setDuration,
   setVolume,
   togglePlay
 } from "../../services/Api/songSlice.tsx";
@@ -16,7 +16,7 @@ import {useFavoriteSongMutation} from "../../services/Api/api.tsx";
 
 const Player = () => {
   const dispatch = useDispatch();
-  const {currentSong, isPlaying, currentTime, duration, volume, songs} =
+  const {currentSong, isPlaying, currentTime, duration, volume} =
       useSelector((state: RootState) => state.song);
   const [favoriteSong] = useFavoriteSongMutation();
 
@@ -122,7 +122,12 @@ const Player = () => {
             {currentSong?.artist || "Пісня не обрана"}
           </p>
         </div>
-        <button onClick={() => favoriteSong(currentSong?.id)} className="text-text-muted hover:text-primary transition ml-2">
+        <button
+            onClick={() =>
+                currentSong?.id && favoriteSong(currentSong.id )
+            }
+            className="text-text-muted hover:text-primary transition ml-2"
+        >
           ❤️
         </button>
       </div>

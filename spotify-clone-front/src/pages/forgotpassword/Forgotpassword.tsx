@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from "react-redux";
 import { useForgotPasswordMutation } from '../../services/Api/api';
 import { Mail, ArrowLeft, LoaderCircle, CheckCircle2, AlertCircle } from 'lucide-react';
 

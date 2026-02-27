@@ -15,4 +15,9 @@ EXPOSE 8080
 
 COPY --from=build /app/target/spotify-clone-back-*.jar ./spotify-clone-back.jar
 
+COPY album_images/ album_images/
+COPY music_images/ music_images/
+COPY music/ music/
+COPY user_images/ user_images/
+
 CMD ["java", "-jar", "/app/spotify-clone-back.jar"]

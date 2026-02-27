@@ -1,8 +1,6 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
-import type {RootState} from './store';
 import {APP_ENV} from '../../env';
 import {logout, setCredentials} from './authSlice';
-import {useDispatch} from "react-redux";
 
 interface AuthResponse {
     success: boolean;
@@ -41,7 +39,7 @@ interface UserResponse {
 
 const baseQuery = fetchBaseQuery({
     baseUrl: APP_ENV.BACKEND_URL + '/api',
-    prepareHeaders: (headers, {getState}) => {
+    prepareHeaders: (headers) => {
         const token = localStorage.getItem('accessToken');
         if (token) {
             headers.set('authorization', `Bearer ${token}`);
@@ -181,15 +179,14 @@ export const api = createApi({
                     query: () => `songs/random`,
                     transformResponse:(response: {data:any}) => response.data,
                 }),
-            favoriteSong:
-                builder.mutation<any, { id: number}>({
-                    query: (id) => ({
-                        url: 'songs/favorite-song',
-                        method: 'POST',
-                        body: { id }, 
-                    }),
-                    invalidatesTags: ['User'],
+            favoriteSong: builder.mutation<any, number>({
+                query: (id) => ({
+                    url: 'songs/favorite-song',
+                    method: 'POST',
+                    body: { id },
                 }),
+                invalidatesTags: ['User'],
+            }),
             getAlbumById: builder.query<any, number | string>({
                 query: (id) => ({
                     url: 'albums/getById',

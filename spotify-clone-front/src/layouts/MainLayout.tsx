@@ -1,7 +1,7 @@
 import { Outlet } from 'react-router-dom';
-import Sidebar from '../components/sidebar/Sidebar';
+import Sidebar from '../components/Sidebar/Sidebar.tsx';
 import Player from '../components/Footer/Player.tsx';
-import Topbar from '../components/topbar/Topbar';
+import Topbar from '../components/Topbar/Topbar.tsx';
 
 const MainLayout = () => {
   return (
