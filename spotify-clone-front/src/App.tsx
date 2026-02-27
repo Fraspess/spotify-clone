@@ -9,6 +9,8 @@ import Oauth2GoogleCallback from "./components/oauth2/Oauth2GoogleCallback.tsx";
 import ConfirmRegisterPage from "./pages/confirmRegisterPage/ConfirmRegisterPage.tsx";
 import AlbumPage from './pages/albumpage/albumpage.tsx';
 import FavoriteSongsPage from './pages/favouritesongpage/favouritesongspage.tsx';
+import ForgotPassword from './pages/forgotpassword/ForgotPassword.tsx';
+import ResetPassword from './pages/resetpassword/resetpassword.tsx';
 
 function App() {
   return (
@@ -16,6 +18,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<AuthPage />} />
         <Route path="/confirm-register" element={<ConfirmRegisterPage/>} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Home />} />
           <Route path="search" element={<SearchPage />} /> 
@@ -24,7 +27,7 @@ function App() {
           <Route path="/favorite-songs" element={<FavoriteSongsPage />} />
           <Route path="all-albums" element={<AllAlbumsPage />} />
           <Route path="/album/:id" element={<AlbumPage />} />
-          
+          <Route path='/forgot-password' element={<ForgotPassword/>} />
           <Route path="/oauth2/callback" element={<Oauth2GoogleCallback/>}/>
 
 
