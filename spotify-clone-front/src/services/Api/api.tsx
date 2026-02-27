@@ -198,7 +198,26 @@ export const api = createApi({
                 }),
                 transformResponse: (response: { data: any }) => response.data,
                 }),
-                searchSongs: builder.query<any, string>({
+            forgotPassword: builder.mutation({
+                query: (dto) => ({
+                    url: '/users/forgot-password',
+                    method: 'POST',
+                    body: {
+                        email: dto.email
+                    },
+                }),
+                }),
+            resetPassword: builder.mutation({
+                query: (dto) => ({
+                    url: `/users/reset-password`,
+                    method: 'POST',
+                    body: {
+                        token: dto.token,
+                        newPassword: dto.newPassword,
+                    },
+                }),
+            }),
+            searchSongs: builder.query<any, string>({
                 query: (search) => ({
                     url: 'songs/search',
                     method: 'GET',
@@ -221,4 +240,6 @@ export const {
     useFavoriteSongMutation,
     useGetAlbumByIdQuery,
     useSearchSongsQuery,
+    useForgotPasswordMutation,
+    useResetPasswordMutation
 } = api;

@@ -209,7 +209,7 @@ function AuthPage() {
               <div className="flex items-center justify-between">
                 <label className="block text-sm font-medium text-text-main">Пароль</label>
                 {mode === 'login' && (
-                  <button type="button" className="text-xs text-text-muted hover:text-primary transition-colors">Забули пароль?</button>
+                  <button type="button" className="text-xs text-text-muted hover:text-primary transition-colors"> <a href="/forgot-password"> Забули пароль? </a></button>
                 )}
               </div>
               <input

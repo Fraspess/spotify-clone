@@ -1,39 +1,41 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from "react-redux";
+import { useForgotPasswordMutation } from '../../services/Api/api';
 import { Mail, ArrowLeft, LoaderCircle, CheckCircle2, AlertCircle } from 'lucide-react';
-import { useForgotPasswordMutation } from '../../services/Api/api'; // Переконайся, що шлях правильний
 
 const ForgotPassword = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [isSent, setIsSent] = useState(false);
   const [error, setError] = useState('');
-
-  // Підключаємо мутацію
-  const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
+  const [forgotPassword] = useForgotPasswordMutation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     setError('');
 
     try {
-      // Відправляємо об'єкт { email } як dto
-      await forgotPassword({ email }).unwrap();
-      setIsSent(true);
+      forgotPassword({email});
+      setTimeout(() => {
+        setIsSent(true);
+        setIsLoading(false);
+      }, 1500);
     } catch (err: any) {
-      // Витягуємо повідомлення про помилку з сервера
-      setError(err.data?.message || 'Користувача з такою поштою не знайдено або помилка сервера');
+      setError(err.data?.message || 'Щось пішло не так. Спробуйте пізніше.');
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center p-6">
       <div className="w-full max-w-md bg-bg-elevated-soft/30 backdrop-blur-xl p-8 rounded-3xl border border-white/5 shadow-2xl relative overflow-hidden">
-        
-        {/* Декоративний градієнт */}
+
         <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
 
-        <button 
+        <button
           onClick={() => navigate('/login')}
           className="flex items-center gap-2 text-xs font-bold text-text-muted hover:text-white transition-colors uppercase tracking-widest mb-8 border-b border-transparent hover:border-text-muted"
         >
@@ -99,25 +101,12 @@ const ForgotPassword = () => {
               <h2 className="text-2xl font-extrabold text-white tracking-tight mb-2">
                 Лист надіслано!
               </h2>
-              <p className="text-sm text-text-muted leading-relaxed">
-                Ми надіслали інструкції на <span className="text-white font-bold">{email}</span>. <br />
-                Перевірте пошту, щоб отримати код підтвердження.
+              <p className="text-sm text-text-muted">
+                Інструкції надіслано на <span className="text-white font-bold">{email}</span>.
               </p>
             </div>
-            
-            <button
-              onClick={() => navigate('/reset-password')} // Перехід на сторінку введення коду та нового пароля
-              className="w-full bg-primary text-black font-bold py-4 rounded-full text-sm hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/20"
-            >
-              Ввести код
-            </button>
 
-            <button
-              onClick={() => setIsSent(false)}
-              className="text-xs font-bold text-text-muted hover:text-white transition-colors uppercase tracking-widest block mx-auto border-b border-transparent hover:border-text-muted"
-            >
-              Спробувати іншу пошту
-            </button>
+
           </div>
         )}
       </div>

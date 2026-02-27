@@ -186,7 +186,7 @@ public class UserService {
         user.setResetPasswordToken(token);
         userRepository.save(user);
 
-        String resetLink = frontEndUrl + "/users/reset-password?token=" + token;
+        String resetLink = frontEndUrl + "/reset-password?token=" + token;
         String subject = "Відновлення паролю";
         String body = """
                 <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 30px;">
