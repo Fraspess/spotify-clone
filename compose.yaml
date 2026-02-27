@@ -4,7 +4,7 @@ services:
     image: frasp/spotify-clone-back:latest
     container_name: api
     environment:
-      - frontend.url=http://localhost
+      - frontend.url=http://18.197.108.246
     ports:
       - "8080:8081"
     networks:
@@ -13,7 +13,7 @@ services:
     build:
       context: spotify-clone-front/
       args:
-        - BACKEND_URL=http://localhost:8080
+        - BACKEND_URL=http://18.197.108.246:8080
     image: frasp/spotify-clone-front:latest
     container_name: front
     depends_on:
