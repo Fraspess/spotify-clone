@@ -7,10 +7,8 @@ import { useGetMeQuery, api, useDisableUserMutation, useForgotPasswordMutation }
 
 const DeleteModal = ({ onConfirm, onCancel, isDeleting }: { onConfirm: () => void; onCancel: () => void; isDeleting: boolean }) => (
   <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4">
-    {/* Backdrop */}
     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onCancel} />
 
-    {/* Modal */}
     <div className="relative w-full max-w-md bg-zinc-900 border border-white/10 rounded-3xl p-6 shadow-2xl animate-in slide-in-from-bottom-4 duration-300">
       <button onClick={onCancel} className="absolute top-4 right-4 text-text-muted hover:text-white transition">
         <X size={20} />
@@ -87,7 +85,6 @@ const ProfilePage = () => {
       )}
 
       <div className="max-w-4xl mx-auto mt-8">
-        {/* Шапка профілю */}
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary/20 to-primary-soft/10 p-8 border border-white/5 mb-8">
           <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
             <div className="h-32 w-32 rounded-full bg-primary flex items-center justify-center text-bg-main shadow-2xl ring-4 ring-white/10">
@@ -117,7 +114,6 @@ const ProfilePage = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Налаштування */}
           <div className="bg-bg-elevated-soft/40 p-6 rounded-2xl border border-white/5 backdrop-blur-sm">
             <h2 className="text-lg font-bold mb-4">Налаштування акаунта</h2>
             <div className="space-y-3">
@@ -140,7 +136,6 @@ const ProfilePage = () => {
             </div>
           </div>
 
-          {/* Сесія */}
           <div className="bg-bg-elevated-soft/40 p-6 rounded-2xl border border-white/5 backdrop-blur-sm flex flex-col justify-between">
             <div>
               <h2 className="text-lg font-bold mb-2">Сесія</h2>
