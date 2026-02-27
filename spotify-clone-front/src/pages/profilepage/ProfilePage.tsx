@@ -1,128 +1,106 @@
-import { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Mail, ArrowLeft, LoaderCircle, CheckCircle2, AlertCircle } from 'lucide-react';
-import { useForgotPasswordMutation } from '../../services/Api/api'; // Переконайся, що шлях правильний
+import { logout } from '../../services/Api/authSlice';
+import { LogOut, User as UserIcon, Mail, ShieldCheck, KeyRound, Trash2 } from 'lucide-react';
+import { useGetMeQuery, api } from "../../services/Api/api.tsx";
+import { useForgotPasswordMutation } from '../../services/Api/api.tsx';
 
-const ForgotPassword = () => {
+const ProfilePage = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [isSent, setIsSent] = useState(false);
-  const [error, setError] = useState('');
 
-  // Підключаємо мутацію
-  const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
+  const { data: userData, isLoading } = useGetMeQuery();
+  const [forgotPassword, { isLoading: isSendingReset, isSuccess: isResetSent }] = useForgotPasswordMutation();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
+  const handleLogout = () => {
+    dispatch(logout());
+    dispatch(api.util.resetApiState());
+    navigate('/');
+  };
 
-    try {
-      // Відправляємо об'єкт { email } як dto
-      await forgotPassword({ email }).unwrap();
-      setIsSent(true);
-    } catch (err: any) {
-      // Витягуємо повідомлення про помилку з сервера
-      setError(err.data?.message || 'Користувача з такою поштою не знайдено або помилка сервера');
-    }
+  const handleChangePassword = async () => {
+    if (!userData?.email) return;
+    await forgotPassword({ email: userData.email });
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center p-6">
-      <div className="w-full max-w-md bg-bg-elevated-soft/30 backdrop-blur-xl p-8 rounded-3xl border border-white/5 shadow-2xl relative overflow-hidden">
-        
-        {/* Декоративний градієнт */}
-        <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div className="max-w-4xl mx-auto mt-8">
+      {/* Шапка профілю */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary/20 to-primary-soft/10 p-8 border border-white/5 mb-8">
+        <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
+          <div className="h-32 w-32 rounded-full bg-primary flex items-center justify-center text-bg-main shadow-2xl ring-4 ring-white/10">
+            <UserIcon size={64} />
+          </div>
 
-        <button 
-          onClick={() => navigate('/login')}
-          className="flex items-center gap-2 text-xs font-bold text-text-muted hover:text-white transition-colors uppercase tracking-widest mb-8 border-b border-transparent hover:border-text-muted"
-        >
-          <ArrowLeft size={14} />
-          Назад до входу
-        </button>
-
-        {!isSent ? (
-          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div>
-              <h1 className="text-2xl font-extrabold tracking-tight text-white mb-2">
-                Забули пароль?
+          {isLoading ? (
+            <div className="text-text-muted text-sm animate-pulse">Завантаження профілю...</div>
+          ) : (
+            <div className="text-center md:text-left">
+              <h1 className="text-4xl font-black tracking-tight text-white mb-2">
+                {userData?.username}
               </h1>
-              <p className="text-sm text-text-muted">
-                Введіть свою електронну адресу для відновлення доступу.
-              </p>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {error && (
-                <div className="bg-red-500/10 border border-red-500/20 p-3 rounded-xl flex items-center gap-3 text-xs text-red-400 font-bold uppercase tracking-wide">
-                  <AlertCircle size={16} />
-                  {error}
+              <div className="flex flex-wrap justify-center md:justify-start gap-4 text-text-muted">
+                <div className="flex items-center gap-2">
+                  <Mail size={16} className="text-primary" />
+                  <span className="text-sm">{userData?.email}</span>
                 </div>
-              )}
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-text-muted uppercase tracking-widest ml-1">
-                  Email адреса
-                </label>
-                <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" size={18} />
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="example@mail.com"
-                    className="w-full bg-zinc-800/50 border border-white/10 rounded-xl py-3.5 pl-12 pr-4 text-sm focus:border-primary outline-none transition-all placeholder:text-zinc-600 text-white font-medium"
-                  />
+                <div className="flex items-center gap-2">
+                  <ShieldCheck size={16} className="text-primary" />
+                  <span className="text-sm">Статус: Слухач</span>
                 </div>
               </div>
+            </div>
+          )}
+        </div>
+      </div>
 
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full bg-white text-black font-bold py-4 rounded-full text-sm hover:scale-105 active:scale-95 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 mt-4"
-              >
-                {isLoading ? (
-                  <LoaderCircle className="animate-spin" size={20} />
-                ) : (
-                  'Надіслати код'
-                )}
-              </button>
-            </form>
-          </div>
-        ) : (
-          <div className="text-center space-y-6 animate-in zoom-in-95 duration-500">
-            <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-primary/30">
-              <CheckCircle2 size={40} className="text-primary" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-extrabold text-white tracking-tight mb-2">
-                Лист надіслано!
-              </h2>
-              <p className="text-sm text-text-muted leading-relaxed">
-                Ми надіслали інструкції на <span className="text-white font-bold">{email}</span>. <br />
-                Перевірте пошту, щоб отримати код підтвердження.
-              </p>
-            </div>
-            
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Налаштування */}
+        <div className="bg-bg-elevated-soft/40 p-6 rounded-2xl border border-white/5 backdrop-blur-sm">
+          <h2 className="text-lg font-bold mb-4">Налаштування акаунта</h2>
+          <div className="space-y-3">
+
+            {/* Зміна пароля */}
             <button
-              onClick={() => navigate('/reset-password')} // Перехід на сторінку введення коду та нового пароля
-              className="w-full bg-primary text-black font-bold py-4 rounded-full text-sm hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/20"
+              onClick={handleChangePassword}
+              disabled={isSendingReset || isResetSent}
+              className="w-full text-left px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 transition text-sm flex items-center gap-3 disabled:opacity-50"
             >
-              Ввести код
+              <KeyRound size={16} className="text-primary" />
+              {isSendingReset
+                ? 'Надсилаємо лист...'
+                : isResetSent
+                ? '✓ Лист надіслано на пошту'
+                : 'Змінити пароль'}
             </button>
 
-            <button
-              onClick={() => setIsSent(false)}
-              className="text-xs font-bold text-text-muted hover:text-white transition-colors uppercase tracking-widest block mx-auto border-b border-transparent hover:border-text-muted"
-            >
-              Спробувати іншу пошту
+            <button className="w-full text-left px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 transition text-sm flex items-center gap-3 text-red-400">
+              <Trash2 size={16} />
+              Видалити акаунт
             </button>
           </div>
-        )}
+        </div>
+
+        {/* Сесія */}
+        <div className="bg-bg-elevated-soft/40 p-6 rounded-2xl border border-white/5 backdrop-blur-sm flex flex-col justify-between">
+          <div>
+            <h2 className="text-lg font-bold mb-2">Сесія</h2>
+            <p className="text-sm text-text-muted mb-6">
+              Керуйте своїм доступом до AudioLab на цьому пристрої.
+            </p>
+          </div>
+
+          <button
+            onClick={handleLogout}
+            className="flex items-center justify-center gap-3 w-full py-4 bg-white text-black font-bold rounded-2xl hover:scale-[1.02] transition active:scale-95 shadow-lg"
+          >
+            <LogOut size={20} />
+            Вийти з профілю
+          </button>
+        </div>
       </div>
     </div>
   );
 };
 
-export default ForgotPassword;
+export default ProfilePage;
