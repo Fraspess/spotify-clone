@@ -3,7 +3,7 @@ import { useGetMeQuery, useFavoriteSongMutation } from '../../services/Api/api';
 import { Play, Music, ArrowLeft, Heart } from 'lucide-react';
 import { useDispatch } from "react-redux";
 import { playSong, setSongs } from "../../services/Api/songSlice.tsx";
-import { APP_ENV } from '../../env/index.ts';
+import { APP_ENV } from '../../env';
 
 const FavoriteSongsPage = () => {
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ const FavoriteSongsPage = () => {
 
   const playMusic = (music: any) => {
     dispatch(playSong({
-      id: String(music.id),
+      id: Number(music.id),
       title: music.title,
       artist: music.artist,
       image: music.image,
@@ -39,7 +39,7 @@ const FavoriteSongsPage = () => {
 const toggleFavorite = async (e: React.MouseEvent, id: any) => {
     e.stopPropagation();
     try {
-        await favoriteMutation({ id: Number(id) }).unwrap();
+        await favoriteMutation(Number(id)).unwrap();
         
     } catch (err) {
         console.error("Mutation failed:", err);

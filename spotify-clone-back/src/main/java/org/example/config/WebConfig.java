@@ -15,6 +15,9 @@ import java.util.List;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
+    @Value("${frontend.url}")
+    private String frontendUrl;
+
     @Value("${music.images.dir}")
     private String musicImagesDir;
 
@@ -35,8 +38,9 @@ public class WebConfig implements WebMvcConfigurer {
     }
     @Override
     public void addCorsMappings(CorsRegistry registry) {
+        System.out.println(frontendUrl);
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:5173")
+                .allowedOrigins(frontendUrl)
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);

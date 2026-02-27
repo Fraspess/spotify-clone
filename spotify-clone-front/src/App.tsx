@@ -5,11 +5,11 @@ import Home from './pages/home/Home.tsx';
 import SearchPage from './pages/searchpage/SearchPage.tsx';
 import ProfilePage from './pages/profilepage/ProfilePage.tsx';
 import AllAlbumsPage from './pages/allalbumspage/AllAlbumsPage.tsx';
-import Oauth2GoogleCallback from "./components/oauth2/Oauth2GoogleCallback.tsx";
+import Oauth2GoogleCallback from "./components/Oauth2/Oauth2GoogleCallback.tsx";
 import ConfirmRegisterPage from "./pages/confirmRegisterPage/ConfirmRegisterPage.tsx";
 import AlbumPage from './pages/albumpage/albumpage.tsx';
 import FavoriteSongsPage from './pages/favouritesongpage/favouritesongspage.tsx';
-import ForgotPassword from './pages/forgotpassword/ForgotPassword.tsx';
+import ForgotPassword from './pages/forgotpassword/Forgotpassword.tsx';
 import ResetPassword from './pages/resetpassword/resetpassword.tsx';
 
 function App() {
