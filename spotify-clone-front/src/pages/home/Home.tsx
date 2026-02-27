@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useGetSongsQuery, useGetAlbumsQuery } from '../../services/Api/api';
 import { Play, Disc, Music, LoaderCircle } from 'lucide-react';
 import {useDispatch} from "react-redux";
-import {playSong } from "../../services/Api/songSlice.tsx";
+import {playSong, setSongs } from "../../services/Api/songSlice.tsx";
 import { APP_ENV } from '../../env/index.ts';
 
 const Home = () => {
@@ -26,6 +26,12 @@ const Home = () => {
   const handleLoadMore = () => {
     setSongLimit(prev => prev + 20);
   };
+
+  useEffect(() => {
+    if(songs.length > 0){
+      dispatch(setSongs(songs));
+    }
+  }, [songs, dispatch]);
 
   useEffect(() => {
     const handleScroll = () => {
